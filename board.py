@@ -2,48 +2,67 @@ from piece import *
 
 
 class Board:
-    def __init__(self):
-        self.board = ["halo"]
-        self.board = [[None, BlackMan(1, 2, self), None, BlackMan(1, 4, self), None, BlackMan(1, 6, self), None,
-                       BlackMan(1, 8, self)],
-                      [BlackMan(2, 1, self), None, BlackMan(2, 3, self), None, BlackMan(2, 5, self), None,
-                       BlackMan(2, 7, self), None],
-                      [None, BlackMan(3, 2, self), None, BlackMan(3, 4, self), None, BlackMan(3, 6, self), None,
-                       BlackMan(3, 8, self)],
-                      [None, None, None, None, None, None, None, None],
-                      [None, None, None, None, None, None, None, None],
-                      [WhiteMan(6, 1, self), None, WhiteMan(6, 3, self), None, WhiteMan(6, 5, self), None,
-                       WhiteMan(6, 7, self), None],
-                      [None, WhiteMan(7, 2, self), None, WhiteMan(7, 4, self), None, WhiteMan(7, 6, self), None,
-                       WhiteMan(7, 8, self)],
-                      [WhiteMan(8, 1, self), None, WhiteMan(8, 3, self), None, WhiteMan(8, 5, self), None,
-                       WhiteMan(8, 7, self), None]
-                      ]
+
+    def __init__(self, board_repr):
+        # 0 not allowed or empty
+        # 2 white man
+        # 3 white king
+        # a black man
+        # b black king
+        self.board = [[], [], [], [], [], [], [], []]
+        for rowNumber, row in enumerate(board_repr):
+            mask = 0xF0000000
+            for columnNumber in range(8):
+                piece = row & mask
+                if piece == 0x20000000:  # white man
+                    self.board[rowNumber].append(WhiteMan(rowNumber, columnNumber, self))
+                elif piece == 0x30000000:  # white king
+                    self.board[rowNumber].append(WhiteKing(rowNumber, columnNumber, self))
+                elif piece == 0xa0000000:  # black man
+                    self.board[rowNumber].append(BlackMan(rowNumber, columnNumber, self))
+                elif piece == 0xb0000000:  # black king
+                    self.board[rowNumber].append(BlackKing(rowNumber, columnNumber, self))
+                else:  # empty or not allowed
+                    self.board[rowNumber].append(None)
+                row = row << 4
+
+    @property
+    def board_repr(self):
+        board = [0, 0, 0, 0, 0, 0, 0, 0]
+        for rowNumber, row in enumerate(self.board):
+            for columnNumber, piece in enumerate(row):
+                if isinstance(piece, WhiteMan):
+                    board[rowNumber] |= 0x00000002
+                elif isinstance(piece, WhiteKing):
+                    board[rowNumber] |= 0x00000003
+                elif isinstance(piece, BlackMan):
+                    board[rowNumber] |= 0x0000000a
+                elif isinstance(piece, BlackKing):
+                    board[rowNumber] |= 0x0000000b
+                else:
+                    board[rowNumber] |= 0x00000008
+                if columnNumber != 7:
+                    board[rowNumber] = board[rowNumber] << 4
+        return tuple(board)
 
     @property
     def pieces(self):
-        # ta linia robi to co 6 wykomentowanych linii na dole, witamy w pythonie
+        """List of pieces"""
         return [piece for row in self.board for piece in row if piece is not None]
-
-        # pieces = []
-        # for row in self.board:
-        #     for piece in row:
-        #         if piece is not None:
-        #             pieces.append(piece)
-        # return pieces
 
     @property
     def balance(self):
+        """Positive balance means white is winning"""
         result = 0
         for piece in self.pieces:
             if isinstance(piece, BlackMan):
-                result += 1
-            if isinstance(piece, BlackKing):
-                result += 1.6
-            if isinstance(piece, WhiteMan):
                 result -= 1
-            if isinstance(piece, WhiteKing):
+            elif isinstance(piece, BlackKing):
                 result -= 1.6
+            elif isinstance(piece, WhiteMan):
+                result += 1
+            elif isinstance(piece, WhiteKing):
+                result += 1.6
         return result
 
     def __str__(self):
@@ -58,10 +77,24 @@ class Board:
         return result
 
 
-def main():
-    board = Board()
+def test_repr_gen():
+    board_repr = (0x8a8a8a8a,
+                  0xa8a8a8a8,
+                  0x8a8a8a8a,
+                  0x88888888,
+                  0x88888888,
+                  0x28282828,
+                  0x82828282,
+                  0x28282828
+                  )
+    board = Board(board_repr)
     print(board)
+    for row_repr in board.board_repr:
+        print(hex(row_repr))
+    print()
+    board2 = Board(board.board_repr)
+    print(board2)
 
 
 if __name__ == '__main__':
-    main()
+    test_repr_gen()

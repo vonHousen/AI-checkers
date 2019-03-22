@@ -4,8 +4,8 @@ class Piece:
 
 class Man(Piece):
     def __init__(self, row, column, board):
-        if (row + column) % 2 is not 1:
-            raise ValueError("Not allowed board cell")
+        # if (row + column) % 2 is not 1:
+        #     raise ValueError("Not allowed board cell")
         self.row = row
         self.column = column
         self.board = board
