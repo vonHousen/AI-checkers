@@ -28,7 +28,11 @@ class State:
         self._cached_board = None
 
     @property
-    def cached_board(self):
+    def board(self):
+        """
+        Cache new Board object (using stored representation) if it doesn't exist
+        :return: Cached or just created Board object
+        """
         if self._cached_board is None:
             self._cached_board = Board(self.board_repr)
         return self._cached_board
@@ -37,7 +41,9 @@ class State:
         self._cached_board = None
 
     def possible_states(self):
-        """Returns all possible states one move from this state"""
+        """
+        :return: all possible states one move from this state
+        """
         states = []
         # todo
         return states
@@ -45,7 +51,7 @@ class State:
 
 def test_cached_board():
     state = State()
-    print(state.cached_board)
+    print(state.board)
     state.clean_cached_board()
 
 

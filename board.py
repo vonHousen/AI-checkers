@@ -4,7 +4,10 @@ from piece import *
 class Board:
 
     def __init__(self, board_repr):
-        # 0 not allowed or empty
+        """
+        :type board_repr: Memory optimized reprezentation of board
+        """
+        # 8 not allowed or empty
         # 2 white man
         # 3 white king
         # a black man
@@ -28,6 +31,9 @@ class Board:
 
     @property
     def board_repr(self):
+        """
+        :return: Memory optimized representation of that board.
+        """
         board = [0, 0, 0, 0, 0, 0, 0, 0]
         for rowNumber, row in enumerate(self.board):
             for columnNumber, piece in enumerate(row):
@@ -47,12 +53,16 @@ class Board:
 
     @property
     def pieces(self):
-        """List of pieces"""
+        """
+        :return: List of pieces on the board
+        """
         return [piece for row in self.board for piece in row if piece is not None]
 
     @property
     def balance(self):
-        """Positive balance means white is winning"""
+        """
+        :return: Positive balance means white is winning
+        """
         result = 0
         for piece in self.pieces:
             if isinstance(piece, BlackMan):
