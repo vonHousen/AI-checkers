@@ -48,12 +48,38 @@ class State:
         # todo
         return states
 
+    # TODO: implement storage of previous states
+    # TODO: implement storage of next states
+
+    def move_to(self, row_current, column_current, row_desired, column_desired):
+        """
+
+        :param row_current: current location of a piece to move
+        :param column_current: current location of a piece to move
+        :param row_desired: desired destination to move to
+        :param column_desired: desired destination to move to
+        :return: new state generated due to the movement
+        """
+
+        # copying self.state and changing it's copy
+        changed_state = self.board
+
+        changed_state.board[row_current][column_current].column = column_desired
+        changed_state.board[row_current][column_current].row = row_desired
+
+        changed_state.board[row_desired][column_desired] = changed_state.board[row_current][column_current]
+        changed_state.board[row_current][column_current] = None
+
+        return changed_state
+
 
 def test_cached_board():
     state = State()
     print(state.board)
+    print(state.move_to(5, 0, 4, 1))
     state.clean_cached_board()
 
 
 if __name__ == '__main__':
     test_cached_board()
+
