@@ -92,23 +92,30 @@ class State:
         # copy self.state and change it's copy
         changed_state = self.board
 
-        if changed_state.board[row_attacked][column_attacked] is WhiteMan \
-                and changed_state.board[row_current][column_current] is BlackMan:
-
-            dx = row_attacked - row_current         # -1 / +1
-            dy = column_attacked - column_current   # -1 / +1
-
-            self.move_to(row_current, column_current, row_current + 2*dx, column_current + 2*dy)
-
         # TODO check with can_attack_it(...)
+
+        dx = row_attacked - row_current         # -1 / +1
+        dy = column_attacked - column_current   # -1 / +1
+
+        changed_state = self.move_to(row_current, column_current, row_current + 2*dx, column_current + 2*dy)
+        changed_state.board[row_attacked][column_attacked] = None
 
         return changed_state
 
 
 def test_cached_board():
-    state = State()
+    board_r = (   0x8a8a8a8a,
+                  0xa8a8a8a8,
+                  0x888a8a8a,
+                  0x88888888,
+                  0x8a888888,
+                  0x28282828,
+                  0x82828282,
+                  0x28282828
+                  )
+    state = State(board_r)
     print(state.board)
-    print(state.attack_it(5, 0, 4, 1))
+    print(state.attack_it(5, 2, 4, 1))
     state.clean_cached_board()
 
 
