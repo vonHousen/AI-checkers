@@ -41,16 +41,8 @@ class State:
     def clean_cached_board(self):
         self._cached_board = None
 
-    def possible_states(self):
-        """
-        :return: all possible states one move from this state
-        """
-        states = []
-        # todo
-        return states
-
-    # TODO: implement storage of previous states
-    # TODO: implement storage of next states
+    # TODO: implement storage of previous states ?
+    # TODO: implement storage of next states ?
 
     def move_to(self, row_current, column_current, row_desired, column_desired):
         """
@@ -80,6 +72,30 @@ class State:
 
         return changed_state
 
+    def can_move_to(self, row_current, column_current, row_desired, column_desired):
+        """
+
+        :param row_current: current location of a piece to move
+        :param column_current: current location of a piece to move
+        :param row_desired: destination to move
+        :param column_desired: destination to move
+        :return: true/false: can it move to desired location?
+        """
+        can_move_to = False     # TODO implement
+
+        return can_move_to
+
+    def can_move(self, row_current, column_current):
+        """
+
+        :param row_current: current location of a piece to move
+        :param column_current: current location of a piece to move
+        :return: true/false: can it move at all?
+        """
+        can_move = False     # TODO implement
+
+        return can_move
+
     def attack_it(self, row_current, column_current, row_attacked, column_attacked):
         """
 
@@ -87,11 +103,8 @@ class State:
         :param column_current: current location of a piece to move
         :param row_attacked: destination to attack
         :param column_attacked: destination to attack
-        :return: new state generated due to the movement
+        :return: new state (deep copy) generated due to the attack
         """
-
-
-        # TODO check with can_attack_it(...)
 
         dx = row_attacked - row_current         # -1 / +1
         dy = column_attacked - column_current   # -1 / +1
@@ -100,6 +113,60 @@ class State:
         changed_state.board[row_attacked][column_attacked] = None
 
         return changed_state
+
+    def can_attack_it(self, row_current, column_current, row_attacked, column_attacked):
+        """
+
+        :param row_current: current location of a piece to move
+        :param column_current: current location of a piece to move
+        :param row_attacked: destination to attack
+        :param column_attacked: destination to attack
+        :return: true/false: can it attack it?
+        """
+        can_attack_it = False    # TODO implement
+
+        return can_attack_it
+
+    def can_attack(self, row_current, column_current):
+        """
+
+        :param row_current: current location of a piece to move
+        :param column_current: current location of a piece to move
+        :return: true/false: can it attack at all?
+        """
+        can_attack = False    # TODO implement
+
+        return can_attack
+
+    def possible_moves(self, row_current, column_current):
+        """
+
+        :param row_current: location of a piece
+        :param column_current: location of a piece
+        :return: count of possible moves to be done by given piece
+        """
+        moves_count = 0     # TODO implement
+
+        return moves_count
+
+    def possible_attacks(self, row_current, column_current):
+        """
+
+        :param row_current: location of a piece
+        :param column_current: location of a piece
+        :return: count of possible attacks to be done by given piece
+        """
+        attack_count = 0   # TODO implement
+
+        return attack_count
+
+    def possible_states(self):
+        """
+        :return: count of all possible states generated from current one
+        """
+        state_count = 0     # TODO implement (should contain also implementation of multiple attacks)
+
+        return state_count
 
 
 def test_attack_board():
@@ -115,7 +182,7 @@ def test_attack_board():
     state = State(board_r)
     print(state.board)
     print(state.attack_it(5, 2, 4, 1))
-    print(state.board)
+    print(state.board)  # should be the first board itself (unchanged)
     state.clean_cached_board()
 
 
