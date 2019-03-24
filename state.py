@@ -1,5 +1,6 @@
 from enum import Enum
 from board import *
+import copy
 
 
 class Turn(Enum):
@@ -58,11 +59,11 @@ class State:
         :param column_current: current location of a piece to move
         :param row_desired: desired destination to move to
         :param column_desired: desired destination to move to
-        :return: new state generated due to the movement
+        :return: new state (deepcopy) generated due to the movement
         """
 
         # copy self.state and change it's copy
-        changed_state = self.board
+        changed_state = copy.deepcopy(self.board)
 
         if changed_state.board[row_desired][column_desired] is None \
                 and changed_state.board[row_current][column_current] is not None \
@@ -89,8 +90,6 @@ class State:
         :return: new state generated due to the movement
         """
 
-        # copy self.state and change it's copy
-        changed_state = self.board
 
         # TODO check with can_attack_it(...)
 
@@ -103,7 +102,7 @@ class State:
         return changed_state
 
 
-def test_cached_board():
+def test_attack_board():
     board_r = (   0x8a8a8a8a,
                   0xa8a8a8a8,
                   0x888a8a8a,
@@ -116,9 +115,10 @@ def test_cached_board():
     state = State(board_r)
     print(state.board)
     print(state.attack_it(5, 2, 4, 1))
+    print(state.board)
     state.clean_cached_board()
 
 
 if __name__ == '__main__':
-    test_cached_board()
+    test_attack_board()
 
