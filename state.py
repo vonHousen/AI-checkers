@@ -61,14 +61,46 @@ class State:
         :return: new state generated due to the movement
         """
 
-        # copying self.state and changing it's copy
+        # copy self.state and change it's copy
         changed_state = self.board
 
-        changed_state.board[row_current][column_current].column = column_desired
-        changed_state.board[row_current][column_current].row = row_desired
+        if changed_state.board[row_desired][column_desired] is None \
+                and changed_state.board[row_current][column_current] is not None \
+                and 8 > row_desired >= 0 \
+                and 8 > column_desired >= 0:
 
-        changed_state.board[row_desired][column_desired] = changed_state.board[row_current][column_current]
-        changed_state.board[row_current][column_current] = None
+            # change piece's location
+            changed_state.board[row_current][column_current].column = column_desired
+            changed_state.board[row_current][column_current].row = row_desired
+
+            # edit board
+            changed_state.board[row_desired][column_desired] = changed_state.board[row_current][column_current]
+            changed_state.board[row_current][column_current] = None
+
+        return changed_state
+
+    def attack_it(self, row_current, column_current, row_attacked, column_attacked):
+        """
+
+        :param row_current: current location of a piece to move
+        :param column_current: current location of a piece to move
+        :param row_attacked: destination to attack
+        :param column_attacked: destination to attack
+        :return: new state generated due to the movement
+        """
+
+        # copy self.state and change it's copy
+        changed_state = self.board
+
+        if changed_state.board[row_attacked][column_attacked] is WhiteMan \
+                and changed_state.board[row_current][column_current] is BlackMan:
+
+            dx = row_attacked - row_current         # -1 / +1
+            dy = column_attacked - column_current   # -1 / +1
+
+            self.move_to(row_current, column_current, row_current + 2*dx, column_current + 2*dy)
+
+        # TODO check with can_attack_it(...)
 
         return changed_state
 
@@ -76,7 +108,7 @@ class State:
 def test_cached_board():
     state = State()
     print(state.board)
-    print(state.move_to(5, 0, 4, 1))
+    print(state.attack_it(5, 0, 4, 1))
     state.clean_cached_board()
 
 
