@@ -168,6 +168,10 @@ class State:
 
         return state_count
 
+    def __str__(self):
+        return self.board.__str__()
+
+
 
 def test_attack_board():
     board_r = (   0x8a8a8a8a,
