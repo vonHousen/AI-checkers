@@ -5,7 +5,7 @@ class Board:
 
     def __init__(self, board_repr):
         """
-        :type board_repr: Memory optimized reprezentation of board
+        :type board_repr: Memory optimized representation of board
         """
         # 8 not allowed or empty
         # 2 white man
@@ -78,12 +78,14 @@ class Board:
     def __str__(self):
         result = ""
         for row in self.board:
+
+            result += "| "
             for piece in row:
                 if piece is None:
-                    result += "-"
+                    result += "." + " "
                 else:
-                    result += f'{piece}'
-            result += "\n"
+                    result += f'{piece}' + " "
+            result += "|" + "\n"
         return result
 
 
