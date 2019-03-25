@@ -8,7 +8,15 @@ class Turn(Enum):
 
 
 class Piece(ABC):
-    pass
+
+    @staticmethod
+    @abstractmethod
+    def get_colour():
+        """
+
+        :return: piece's colour
+        """
+        pass
 
 
 class Man(Piece):
@@ -77,6 +85,12 @@ class Man(Piece):
 
         return can_attack_it
 
+    @staticmethod
+    @abstractmethod
+    def get_colour():
+        pass
+
+
     @abstractmethod
     def list_possible_moves(self):
         """
@@ -112,7 +126,9 @@ class BlackMan(Man):
     def __init__(self, row, column, board):
         super().__init__(row, column, board)
 
-    colour = Turn.BLACK
+    @staticmethod
+    def get_colour():
+        return Turn.BLACK
 
     def __str__(self):
         return "b"
@@ -137,7 +153,9 @@ class WhiteMan(Man):
     def __init__(self, row, column, board):
         super().__init__(row, column, board)
 
-    colour = Turn.WHITE
+    @staticmethod
+    def get_colour():
+        return Turn.WHITE
 
     def __str__(self):
         return "w"
@@ -162,6 +180,69 @@ class King(Piece):
     def __init__(self, row, column, board):
         super().__init__(row, column, board)
 
+    def can_move(self):
+        """
+
+        :return: true/false: can it move at all?
+        """
+        can_move = False        # TODO implement
+
+        return can_move
+
+    def can_attack(self):
+        """
+
+        :return: true/false: can it attack at all?
+        """
+        can_attack = False      # TODO implement
+
+        return can_attack
+
+    def possible_attacks(self):
+        """
+
+        :return: count of possible attacks to be done by given piece
+        """
+        attack_count = 0        # TODO implement
+
+        return attack_count
+
+    def possible_moves(self):
+        """
+
+        :return: count of possible moves to be done by given piece
+        """
+        moves_count = 0     # TODO implement
+
+        return moves_count
+
+    def can_move_to(self, row_desired, column_desired):
+        """
+
+        :param row_desired: destination to move
+        :param column_desired: destination to move
+        :return: true/false: can it move to desired location?
+        """
+        can_move_to = False     # TODO implement
+
+        return can_move_to
+
+    def can_attack_it(self, row_attacked, column_attacked):
+        """
+
+        :param row_attacked: destination to attack
+        :param column_attacked: destination to attack
+        :return: true/false: can it attack it?
+        """
+        can_attack_it = False    # TODO implement
+
+        return can_attack_it
+
+    @staticmethod
+    @abstractmethod
+    def get_colour():
+        pass
+
 
 class WhiteKing(King):
     def __init__(self, row, column, board):
@@ -170,8 +251,9 @@ class WhiteKing(King):
     def __str__(self):
         return "W"
 
-    colour = Turn.WHITE
-
+    @staticmethod
+    def get_colour():
+        return Turn.WHITE
 
 
 class BlackKing(King):
@@ -181,5 +263,7 @@ class BlackKing(King):
     def __str__(self):
         return "B"
 
-    colour = Turn.BLACK
+    @staticmethod
+    def get_colour():
+        return Turn.BLACK
 

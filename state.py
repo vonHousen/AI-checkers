@@ -5,14 +5,14 @@ import copy
 class State:
 
     def __init__(self, next_turn=Turn.WHITE, board_repr=(0x8a8a8a8a,
-                                   0xa8a8a8a8,
-                                   0x8a8a8a8a,
-                                   0x88888888,
-                                   0x88888888,
-                                   0x28282828,
-                                   0x82828282,
-                                   0x28282828
-                                   )):
+                                                         0xa8a8a8a8,
+                                                         0x8a8a8a8a,
+                                                         0x88888888,
+                                                         0x88888888,
+                                                         0x28282828,
+                                                         0x82828282,
+                                                         0x28282828
+                                                         )):
         self.turn = next_turn
         # 8 not allowed or empty
         # 2 white man
@@ -40,7 +40,7 @@ class State:
 
     def move_to(self, row_current, column_current, row_desired, column_desired):
         """
-
+        Universal method to move one piece from curr loc to desired. It's not validating movements for generalization!
         :param row_current: current location of a piece to move
         :param column_current: current location of a piece to move
         :param row_desired: desired destination to move to
@@ -66,30 +66,6 @@ class State:
 
         return changed_state
 
-    def can_move_to(self, row_current, column_current, row_desired, column_desired):
-        """
-
-        :param row_current: current location of a piece to move
-        :param column_current: current location of a piece to move
-        :param row_desired: destination to move
-        :param column_desired: destination to move
-        :return: true/false: can it move to desired location?
-        """
-        can_move_to = False     # TODO implement
-
-        return can_move_to
-
-    def can_move(self, row_current, column_current):
-        """
-
-        :param row_current: current location of a piece to move
-        :param column_current: current location of a piece to move
-        :return: true/false: can it move at all?
-        """
-        can_move = False     # TODO implement
-
-        return can_move
-
     def attack_it(self, row_current, column_current, row_attacked, column_attacked):
         """
 
@@ -100,82 +76,34 @@ class State:
         :return: new state (deep copy) generated due to the attack
         """
 
-        dx = row_attacked - row_current         # -1 / +1
-        dy = column_attacked - column_current   # -1 / +1
+        changed_state = copy.deepcopy(self.board)   # possibly unnecessary
 
-        changed_state = self.move_to(row_current, column_current, row_current + 2*dx, column_current + 2*dy)
-        changed_state.board[row_attacked][column_attacked] = None
+        if changed_state.board[row_current][column_current] is Man:
+            dx = row_attacked - row_current         # -1 / +1
+            dy = column_attacked - column_current   # -1 / +1
+
+            changed_state = self.move_to(row_current, column_current, row_current + 2*dx, column_current + 2*dy)
+            changed_state.board[row_attacked][column_attacked] = None
+
+        elif changed_state.board[row_current][column_current] is King:
+            pass     # TODO implement!
 
         return changed_state
-
-    def can_attack_it(self, row_current, column_current, row_attacked, column_attacked):
-        """
-
-        :param row_current: current location of a piece to move
-        :param column_current: current location of a piece to move
-        :param row_attacked: destination to attack
-        :param column_attacked: destination to attack
-        :return: true/false: can it attack it?
-        """
-        can_attack_it = False    # TODO implement
-
-        return can_attack_it
-
-    def can_attack(self, row_current, column_current):
-        """
-
-        :param row_current: current location of a piece to move
-        :param column_current: current location of a piece to move
-        :return: true/false: can it attack at all?
-        """
-        can_attack = False    # TODO implement
-
-        return can_attack
-
-    def possible_moves(self, row_current, column_current):
-        """
-
-        :param row_current: location of a piece
-        :param column_current: location of a piece
-        :return: count of possible moves to be done by given piece
-        """
-        moves_count = 0     # TODO implement
-
-        return moves_count
-
-    def possible_attacks(self, row_current, column_current):
-        """
-
-        :param row_current: location of a piece
-        :param column_current: location of a piece
-        :return: count of possible attacks to be done by given piece
-        """
-        attack_count = 0   # TODO implement
-
-        return attack_count
-
-    def possible_states(self):
-        """
-        :return: count of all possible states generated from current one
-        """
-        state_count = 0     # not sure if needed anymore
-
-        return state_count
 
     def __str__(self):
         return self.board.__str__()
 
 
 def test_attack_board():
-    board_r = (   0x8a8a8a8a,
-                  0xa8a8a8a8,
-                  0x888a8a8a,
-                  0x88888888,
-                  0x8a888888,
-                  0x28282828,
-                  0x82828282,
-                  0x28282828
-                  )
+    board_r = (0x8a8a8a8a,
+               0xa8a8a8a8,
+               0x888a8a8a,
+               0x88888888,
+               0x8a888888,
+               0x28282828,
+               0x82828282,
+               0x28282828
+               )
     state = State(Turn.WHITE, board_r)
     print(state.board)
     print(state.attack_it(5, 2, 4, 1))
