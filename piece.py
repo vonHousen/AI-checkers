@@ -1,4 +1,11 @@
 from abc import ABC, abstractmethod
+from enum import Enum
+
+
+class Turn(Enum):
+    WHITE = 0
+    BLACK = 1
+
 
 class Piece(ABC):
     pass
@@ -105,6 +112,8 @@ class BlackMan(Man):
     def __init__(self, row, column, board):
         super().__init__(row, column, board)
 
+    colour = Turn.BLACK
+
     def __str__(self):
         return "b"
 
@@ -127,6 +136,8 @@ class BlackMan(Man):
 class WhiteMan(Man):
     def __init__(self, row, column, board):
         super().__init__(row, column, board)
+
+    colour = Turn.WHITE
 
     def __str__(self):
         return "w"
@@ -159,6 +170,9 @@ class WhiteKing(King):
     def __str__(self):
         return "W"
 
+    colour = Turn.WHITE
+
+
 
 class BlackKing(King):
     def __init__(self, row, column, board):
@@ -166,3 +180,6 @@ class BlackKing(King):
 
     def __str__(self):
         return "B"
+
+    colour = Turn.BLACK
+

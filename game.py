@@ -4,7 +4,7 @@ from state import *
 class Game:
     def __init__(self):
         self.states = [[State()]]   # array of sets of states (in 1 row all possible states)
-        # TODO need to implement another data structure: tree
+        # TODO need to implement better data structure: tree
 
     def print_set(self, no_set_of_states):
         """
@@ -17,16 +17,17 @@ class Game:
                 print("set_of_states: " + f'{no_set_of_states}' + " | state no: " + f'{no}')
                 print(state)
 
-    def generate_next_states(self):
+    def generate_next_states(self, turn):
         """
         Generates all possible states generated from the last one (appends to self.states)
+        :param turn: decides what turn (what colour) it is for generating new states
         :return: -
         """
 
-        last_state = self.states[-1][0]
-        self.states.append([])          # new set_of_states
+        last_state = self.states[-1][0]     # it should be parent in the tree structure
+        self.states.append([])              # new set_of_states
 
-        for piece in last_state.board.pieces:
+        for piece in last_state.board.get_pieces(turn):
 
             if piece.can_attack():
                 for destination in piece.list_possible_attacks:
@@ -36,7 +37,7 @@ class Game:
                     self.states[-1].append(
                         last_state.attack_it(attacker_row, attacker_col, destination[0], destination[1]))
 
-                    # TODO if just appended state can result in multiple-attack: append new states, del prev.
+                    # TODO if just appended state result in multiple-attack: append new states, delete prev.
                     # TODO make it recursive (no one knows how many multiple-attacks a piece can perform
 
             elif piece.can_move():

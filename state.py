@@ -1,16 +1,10 @@
-from enum import Enum
 from board import *
 import copy
 
 
-class Turn(Enum):
-    WHITE = 0
-    BLACK = 1
-
-
 class State:
 
-    def __init__(self, board_repr=(0x8a8a8a8a,
+    def __init__(self, next_turn=Turn.WHITE, board_repr=(0x8a8a8a8a,
                                    0xa8a8a8a8,
                                    0x8a8a8a8a,
                                    0x88888888,
@@ -19,7 +13,7 @@ class State:
                                    0x82828282,
                                    0x28282828
                                    )):
-        self.turn = Turn.BLACK
+        self.turn = next_turn
         # 8 not allowed or empty
         # 2 white man
         # 3 white king
@@ -41,8 +35,8 @@ class State:
     def clean_cached_board(self):
         self._cached_board = None
 
-    # TODO: implement storage of previous states ?
-    # TODO: implement storage of next states ?
+    # TODO: implement storage of previous states ? (tree structure)
+    # TODO: implement storage of next states ? (tree structure)
 
     def move_to(self, row_current, column_current, row_desired, column_desired):
         """
@@ -164,13 +158,12 @@ class State:
         """
         :return: count of all possible states generated from current one
         """
-        state_count = 0     # TODO implement (should contain also implementation of multiple attacks)
+        state_count = 0     # not sure if needed anymore
 
         return state_count
 
     def __str__(self):
         return self.board.__str__()
-
 
 
 def test_attack_board():
@@ -183,7 +176,7 @@ def test_attack_board():
                   0x82828282,
                   0x28282828
                   )
-    state = State(board_r)
+    state = State(Turn.WHITE, board_r)
     print(state.board)
     print(state.attack_it(5, 2, 4, 1))
     print(state.board)  # should be the first board itself (unchanged)
@@ -192,4 +185,3 @@ def test_attack_board():
 
 if __name__ == '__main__':
     test_attack_board()
-
