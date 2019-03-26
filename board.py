@@ -58,7 +58,7 @@ class Board:
         """
         return [piece for row in self.board for piece in row if piece is not None]
 
-    def get_pieces(self, colour):
+    def get_pieces_of_colour(self, colour):
         """
         :return: List of pieces on the board of specific colour
         """

@@ -6,6 +6,8 @@ class Turn(Enum):
     WHITE = 0
     BLACK = 1
 
+# TODO create new Enum for colours and refactor code
+
 
 class Piece(ABC):
 
@@ -32,7 +34,7 @@ class Man(Piece):
 
         :return: true/false: can it move at all?
         """
-        can_move = False        # TODO implement
+        can_move = False        # TODO implement, decide if necessary
 
         return can_move
 
@@ -41,7 +43,7 @@ class Man(Piece):
 
         :return: true/false: can it attack at all?
         """
-        can_attack = False      # TODO implement
+        can_attack = False      # TODO implement - used as interface
 
         return can_attack
 
@@ -50,7 +52,7 @@ class Man(Piece):
 
         :return: count of possible attacks to be done by given piece
         """
-        attack_count = 0        # TODO implement
+        attack_count = 0        # TODO implement, decide if necessary
 
         return attack_count
 
@@ -59,7 +61,7 @@ class Man(Piece):
 
         :return: count of possible moves to be done by given piece
         """
-        moves_count = 0     # TODO implement
+        moves_count = 0     # TODO implement, decide if necessary
 
         return moves_count
 
@@ -70,7 +72,7 @@ class Man(Piece):
         :param column_desired: destination to move
         :return: true/false: can it move to desired location?
         """
-        can_move_to = False     # TODO implement
+        can_move_to = False     # TODO implement, decide if necessary
 
         return can_move_to
 
@@ -81,7 +83,7 @@ class Man(Piece):
         :param column_attacked: destination to attack
         :return: true/false: can it attack it?
         """
-        can_attack_it = False    # TODO implement
+        can_attack_it = False    # TODO implement, decide if necessary
 
         return can_attack_it
 
@@ -89,7 +91,6 @@ class Man(Piece):
     @abstractmethod
     def get_colour():
         pass
-
 
     @abstractmethod
     def list_possible_moves(self):
@@ -185,7 +186,7 @@ class King(Piece):
 
         :return: true/false: can it move at all?
         """
-        can_move = False        # TODO implement
+        can_move = False        # TODO implement, decide if necessary
 
         return can_move
 
@@ -194,7 +195,7 @@ class King(Piece):
 
         :return: true/false: can it attack at all?
         """
-        can_attack = False      # TODO implement
+        can_attack = False      # TODO implement - used as interface
 
         return can_attack
 
@@ -203,7 +204,7 @@ class King(Piece):
 
         :return: count of possible attacks to be done by given piece
         """
-        attack_count = 0        # TODO implement
+        attack_count = 0        # TODO implement, decide if necessary
 
         return attack_count
 
@@ -212,7 +213,7 @@ class King(Piece):
 
         :return: count of possible moves to be done by given piece
         """
-        moves_count = 0     # TODO implement
+        moves_count = 0     # TODO implement, decide if necessary
 
         return moves_count
 
@@ -223,7 +224,7 @@ class King(Piece):
         :param column_desired: destination to move
         :return: true/false: can it move to desired location?
         """
-        can_move_to = False     # TODO implement
+        can_move_to = False     # TODO implement, decide if necessary
 
         return can_move_to
 
@@ -234,7 +235,7 @@ class King(Piece):
         :param column_attacked: destination to attack
         :return: true/false: can it attack it?
         """
-        can_attack_it = False    # TODO implement
+        can_attack_it = False    # TODO implement, decide if necessary
 
         return can_attack_it
 
