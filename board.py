@@ -3,7 +3,15 @@ from piece import *
 
 class Board:
 
-    def __init__(self, board_repr):
+    def __init__(self, board_repr=(0x8a8a8a8a,
+                                   0xa8a8a8a8,
+                                   0x8a8a8a8a,
+                                   0x88888888,
+                                   0x88888888,
+                                   0x28282828,
+                                   0x82828282,
+                                   0x28282828
+                                   )):
         """
         :type board_repr: Memory optimized representation of board
         """
@@ -104,16 +112,7 @@ class Board:
 
 
 def test_repr_gen():
-    board_repr = (0x8a8a8a8a,
-                  0xa8a8a8a8,
-                  0x8a8a8a8a,
-                  0x88888888,
-                  0x88888888,
-                  0x28282828,
-                  0x82828282,
-                  0x28282828
-                  )
-    board = Board(board_repr)
+    board = Board()
     print(board)
     for row_repr in board.board_repr:
         print(hex(row_repr))
@@ -122,5 +121,32 @@ def test_repr_gen():
     print(board2)
 
 
+def test_man_moves():
+    board = Board()
+    for piece in board.pieces:
+        print(piece.list_possible_moves())
+
+
+def test_man_attacks():
+    board_repr = (0x8a8a8a8a,
+                  0xa8a8a8a8,
+                  0x8a8a8a8a,
+                  0x88288888,
+                  0x88888a88,
+                  0x28282828,
+                  0x82828282,
+                  0x28282828
+                  )
+    board = Board(board_repr)
+    print(board)
+
+    for piece in board.pieces:
+        listt = piece.list_possible_attacks()
+        if listt:
+            print(listt)
+
+
 if __name__ == '__main__':
-    test_repr_gen()
+    # test_repr_gen()
+    # test_man_moves()
+    test_man_attacks()
