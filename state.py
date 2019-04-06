@@ -4,15 +4,15 @@ import copy
 
 class State:
 
-    def __init__(self, next_turn=Turn.WHITE, board_repr=(0x8a8a8a8a,
-                                                         0xa8a8a8a8,
-                                                         0x8a8a8a8a,
-                                                         0x88888888,
-                                                         0x88888888,
-                                                         0x28282828,
-                                                         0x82828282,
-                                                         0x28282828
-                                                         )):
+    def __init__(self, next_turn=Color.WHITE, board_repr=(0x8a8a8a8a,
+                                                          0xa8a8a8a8,
+                                                          0x8a8a8a8a,
+                                                          0x88888888,
+                                                          0x88888888,
+                                                          0x28282828,
+                                                          0x82828282,
+                                                          0x28282828
+                                                          )):
         self.turn = next_turn
         # 8 not allowed or empty
         # 2 white man
@@ -35,9 +35,6 @@ class State:
     def clean_cached_board(self):
         self._cached_board = None
 
-    # TODO: implement storage of previous state (parent) (tree structure)
-    # TODO: implement storage of next states (children) (tree structure)
-
     def get_state_after_movement(self, row_current, column_current, row_desired, column_desired):
         """
         Universal method to move one piece from curr loc to desired. It's not validating movements for generalization!
@@ -47,22 +44,18 @@ class State:
         :param column_desired: desired destination to move to
         :return: new state (deepcopy) generated due to the movement
         """
-
+        # todo w tej funkcji jest pewna niespojność, zwraca ona obiekt klasy board nie state
         # copy self.state and change it's copy
         changed_state = copy.deepcopy(self.board)
 
-        if changed_state.board[row_desired][column_desired] is None \
-                and changed_state.board[row_current][column_current] is not None \
+        if not changed_state.there_is_piece_at(row_desired, column_desired) \
+                and changed_state.there_is_piece_at(row_current, column_current) \
                 and 8 > row_desired >= 0 \
                 and 8 > column_desired >= 0:
-
             # change piece's location
-            changed_state.board[row_current][column_current].column = column_desired
-            changed_state.board[row_current][column_current].row = row_desired
 
-            # edit board
-            changed_state.board[row_desired][column_desired] = changed_state.board[row_current][column_current]
-            changed_state.board[row_current][column_current] = None
+            piece = changed_state.get_piece_at(row_current, column_current)
+            piece.move_to(row_desired, column_desired)
 
         return changed_state
 
@@ -76,20 +69,20 @@ class State:
         :return: new state (deep copy) generated due to the attack
         """
 
-        changed_state = copy.deepcopy(self.board)   # possibly unnecessary
+        changed_state = copy.deepcopy(self.board)  # possibly unnecessary
 
-        if changed_state.board[row_current][column_current] is Man:     # TODO use isInstance() (each time)
-            dx = row_attacked - row_current         # -1 / +1
-            dy = column_attacked - column_current   # -1 / +1
+        if changed_state.__board[row_current][column_current] is Man:  # TODO use isInstance() (each time)
+            dx = row_attacked - row_current  # -1 / +1
+            dy = column_attacked - column_current  # -1 / +1
 
             changed_state = self.get_state_after_movement(row_current,
                                                           column_current,
                                                           row_current + 2 * dx,
                                                           column_current + 2 * dy)
-            changed_state.board[row_attacked][column_attacked] = None
+            changed_state.__board[row_attacked][column_attacked] = None
 
-        elif changed_state.board[row_current][column_current] is King:
-            pass     # TODO implement!
+        elif changed_state.__board[row_current][column_current] is King:
+            pass  # TODO implement!
 
         return changed_state
 
@@ -113,7 +106,7 @@ class State:
     # def generate_next_states(self, turn):
     #     """
     #     Generates all possible states generated from the last one (appends to self.states)
-    #     :param turn: decides what turn (what colour) it is for generating new states
+    #     :param turn: decides what turn (what color) it is for generating new states
     #     :return: -
     #     """
     #     # TODO move to State
@@ -121,7 +114,7 @@ class State:
     #     last_state = self.states[-1][0]  # it should be parent in the tree structure
     #     self.states.append([])  # new set_of_states
     #
-    #     for piece in last_state.board.get_pieces_of_colour(turn):
+    #     for piece in last_state.board.get_pieces_of_color(turn):
     #
     #         if piece.can_attack():
     #             for destination in piece.list_possible_attacks:
@@ -154,7 +147,7 @@ def test_attack_board():
                0x82828282,
                0x28282828
                )
-    state = State(Turn.WHITE, board_r)
+    state = State(Color.WHITE, board_r)
     print(state.board)
     print(state.get_state_after_attack(5, 2, 4, 1))
     print(state.board)  # should be the first board itself (unchanged)

@@ -3,7 +3,15 @@ from piece import *
 
 class Board:
 
-    def __init__(self, board_repr):
+    def __init__(self, board_repr=(0x8a8a8a8a,
+                                   0xa8a8a8a8,
+                                   0x8a8a8a8a,
+                                   0x88888888,
+                                   0x88888888,
+                                   0x28282828,
+                                   0x82828282,
+                                   0x28282828
+                                   )):
         """
         :type board_repr: Memory optimized representation of board
         """
@@ -12,21 +20,21 @@ class Board:
         # 3 white king
         # a black man
         # b black king
-        self.board = [[], [], [], [], [], [], [], []]
+        self.__board = [[], [], [], [], [], [], [], []]
         for rowNumber, row in enumerate(board_repr):
             mask = 0xF0000000
             for columnNumber in range(8):
                 piece = row & mask
                 if piece == 0x20000000:  # white man
-                    self.board[rowNumber].append(WhiteMan(rowNumber, columnNumber, self))
+                    self.__board[rowNumber].append(WhiteMan(rowNumber, columnNumber, self))
                 elif piece == 0x30000000:  # white king
-                    self.board[rowNumber].append(WhiteKing(rowNumber, columnNumber, self))
+                    self.__board[rowNumber].append(WhiteKing(rowNumber, columnNumber, self))
                 elif piece == 0xa0000000:  # black man
-                    self.board[rowNumber].append(BlackMan(rowNumber, columnNumber, self))
+                    self.__board[rowNumber].append(BlackMan(rowNumber, columnNumber, self))
                 elif piece == 0xb0000000:  # black king
-                    self.board[rowNumber].append(BlackKing(rowNumber, columnNumber, self))
+                    self.__board[rowNumber].append(BlackKing(rowNumber, columnNumber, self))
                 else:  # empty or not allowed
-                    self.board[rowNumber].append(None)
+                    self.__board[rowNumber].append(None)
                 row = row << 4
 
     @property
@@ -35,7 +43,7 @@ class Board:
         :return: Memory optimized representation of that board.
         """
         board = [0, 0, 0, 0, 0, 0, 0, 0]
-        for rowNumber, row in enumerate(self.board):
+        for rowNumber, row in enumerate(self.__board):
             for columnNumber, piece in enumerate(row):
                 if isinstance(piece, WhiteMan):
                     board[rowNumber] |= 0x00000002
@@ -56,13 +64,13 @@ class Board:
         """
         :return: List of pieces on the board
         """
-        return [piece for row in self.board for piece in row if piece is not None]
+        return [piece for row in self.__board for piece in row if piece is not None]
 
-    def get_pieces_of_colour(self, colour):
+    def get_pieces_of_color(self, colour):
         """
         :return: List of pieces on the board of specific colour
         """
-        return [piece for row in self.board for piece in row if (piece is not None and piece.colour == colour)]
+        return [piece for row in self.__board for piece in row if (piece is not None and piece.colour == colour)]
 
     @property
     def balance(self):
@@ -81,9 +89,20 @@ class Board:
                 result += 1.6
         return result
 
+    def there_is_piece_at(self, row, column):
+        if self.__board[row][column] is None:
+            return True
+        return False
+
+    def get_piece_at(self, row, column):
+        return self.__board[row][column]
+
+    def delete_piece_at(self,row,column):
+        self.__board[row][column] = None
+
     def __str__(self):
         result = ""
-        for row in self.board:
+        for row in self.__board:
 
             result += "| "
             for piece in row:
@@ -96,16 +115,7 @@ class Board:
 
 
 def test_repr_gen():
-    board_repr = (0x8a8a8a8a,
-                  0xa8a8a8a8,
-                  0x8a8a8a8a,
-                  0x88888888,
-                  0x88888888,
-                  0x28282828,
-                  0x82828282,
-                  0x28282828
-                  )
-    board = Board(board_repr)
+    board = Board()
     print(board)
     for row_repr in board.board_repr:
         print(hex(row_repr))
@@ -114,5 +124,32 @@ def test_repr_gen():
     print(board2)
 
 
+def test_man_moves():
+    board = Board()
+    for piece in board.pieces:
+        print(piece.possible_moves())
+
+
+def test_man_attacks():
+    board_repr = (0x8a8a8a8a,
+                  0xa8a8a8a8,
+                  0x8a8a8a8a,
+                  0x88288888,
+                  0x88888a88,
+                  0x28282828,
+                  0x82828282,
+                  0x28282828
+                  )
+    board = Board(board_repr)
+    print(board)
+
+    for piece in board.pieces:
+        possible_attacks_list = piece.possible_attacks()
+        if possible_attacks_list:
+            print(possible_attacks_list)
+
+
 if __name__ == '__main__':
     test_repr_gen()
+    test_man_moves()
+    test_man_attacks()
