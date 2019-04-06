@@ -38,22 +38,37 @@ class Piece:
             return True
         return False
 
-    def _is_different_color_than(self, piece):
-        if self.color != piece.color:
-            return True
-        return False
-
     @abstractproperty
     def color(self):
         pass
 
     @abstractmethod
     def possible_moves(self):
+        """
+        :return: list of all possible moves ( example: [(0,1), (0,3)] ) - moves are tuples (row,column)
+        """
         pass
 
     @abstractmethod
     def possible_attacks(self):
+        """
+        Note that function returns new positions of attacking piece not positions of piece being attacked!
+        :return: list of all possible attacks ( example: [(0,1), (0,3)] ) - attacks are tuples (row,column)
+        """
         pass
+
+    @abstractmethod
+    def move_to(self, row_desired, column_desired):
+        pass
+
+    @abstractmethod
+    def attack_to(self, row_desired, column_desired):
+        pass
+
+    def _is_different_color_than(self, piece):
+        if self.color != piece.color:
+            return True
+        return False
 
 
 class Man(Piece):
@@ -65,21 +80,29 @@ class Man(Piece):
         self.board = board
 
     def possible_moves(self):
-        """
-        :return: list of all possible moves ( example: [(0,1), (0,3)] )
-        """
 
         directions = self._potential_moves()
         return [(row, col) for row, col in directions if self._can_move_to(row, col)]
 
     def possible_attacks(self):
-        """
-        Note that function returns new positions of attacking piece not positions of piece being attacked!
-        :return: list of all possible attacks ( example: [(0,1), (0,3)] )
-        """
 
         directions = self._potential_attacks()
         return [(row, col) for row, col in directions if self._can_attack_to(row, col)]
+
+    def move_to(self, row_desired, column_desired):
+
+        self.board[self.row][self.column] = None
+        self.board[row_desired][column_desired] = self
+
+        self.row = row_desired
+        self.column = column_desired
+
+    def attack_to(self, row_desired, column_desired):
+        row_attacked = (row_desired + self.row) // 2
+        column_attacked = (column_desired + self.column) // 2
+
+        self.move_to(row_desired, column_desired)
+        self.board.delete_piece_at(row_attacked, column_attacked)
 
     def _can_move_to(self, row_desired, column_desired):
         """
@@ -97,7 +120,7 @@ class Man(Piece):
         if not is_allowed_cell_on_board(row_desired, column_desired):
             return False
 
-        if not self.board.there_is_any_piece_at(row_desired, column_desired):
+        if not self.board.there_is_piece_at(row_desired, column_desired):
             return False
         return True
 
@@ -110,7 +133,7 @@ class Man(Piece):
 
         if not is_allowed_cell_on_board(row_desired, column_desired):
             return False
-        if not self.board.there_is_any_piece_at(row_desired, column_desired):
+        if not self.board.there_is_piece_at(row_desired, column_desired):
             return False
 
         row_attacked = (self.row + row_desired) // 2
@@ -134,7 +157,7 @@ class Man(Piece):
     def _potential_attacks(self):
         Potential_attacks = namedtuple("Man_potential_attacks", ["up_left", "up_right", "down_left", "down_right"])
         return Potential_attacks((self.row - 2, self.column - 2), (self.row - 2, self.column + 2),
-                          (self.row + 2, self.column - 2), (self.row + 2, self.column + 2))
+                                 (self.row + 2, self.column - 2), (self.row + 2, self.column + 2))
 
 
 class BlackMan(Man):
@@ -175,9 +198,8 @@ class King(Piece):
     def __init__(self, row, column, board):
         super().__init__(row, column, board)
 
-    def can_move_to(self, row_desired, column_desired):
+    def _can_move_to(self, row_desired, column_desired):
         """
-
         :param row_desired: destination to move
         :param column_desired: destination to move
         :return: true/false: can it move to desired location?
@@ -186,16 +208,21 @@ class King(Piece):
 
         return can_move_to
 
-    def can_attack_to(self, row_attacked, column_attacked):
+    def _can_attack_to(self, row_desired, column_desired):
         """
-
         :param row_attacked: destination to attack
         :param column_attacked: destination to attack
-        :return: true/false: can it attack it?
+        :return: true/false: can it attack to?
         """
         can_attack_it = False  # TODO implement, decide if necessary
 
         return can_attack_it
+
+    def possible_attacks(self):
+        pass
+
+    def possible_moves(self):
+        pass
 
 
 class WhiteKing(King):

@@ -66,7 +66,7 @@ class Board:
         """
         return [piece for row in self.__board for piece in row if piece is not None]
 
-    def get_pieces_of_colour(self, colour):
+    def get_pieces_of_color(self, colour):
         """
         :return: List of pieces on the board of specific colour
         """
@@ -89,13 +89,16 @@ class Board:
                 result += 1.6
         return result
 
-    def there_is_any_piece_at(self, row, column):
+    def there_is_piece_at(self, row, column):
         if self.__board[row][column] is None:
             return True
         return False
 
     def get_piece_at(self, row, column):
         return self.__board[row][column]
+
+    def delete_piece_at(self,row,column):
+        self.__board[row][column] = None
 
     def __str__(self):
         result = ""
