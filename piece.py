@@ -29,12 +29,12 @@ def is_allowed_cell_on_board(row, column):
 class Piece:
 
     def can_move_anywhere(self):
-        if self.list_possible_moves():
+        if self.possible_moves():
             return True
         return False
 
     def can_attack_anywhere(self):
-        if self.list_possible_attacks():
+        if self.possible_attacks():
             return True
         return False
 
@@ -48,11 +48,11 @@ class Piece:
         pass
 
     @abstractmethod
-    def list_possible_moves(self):
+    def possible_moves(self):
         pass
 
     @abstractmethod
-    def list_possible_attacks(self):
+    def possible_attacks(self):
         pass
 
 
@@ -64,37 +64,40 @@ class Man(Piece):
         self.column = column
         self.board = board
 
-    def list_possible_moves(self):
+    def possible_moves(self):
         """
         :return: list of all possible moves ( example: [(0,1), (0,3)] )
         """
 
-        directions = self._possible_move_directions()
+        directions = self._potential_moves()
         return [(row, col) for row, col in directions if self._can_move_to(row, col)]
 
-    def list_possible_attacks(self):
+    def possible_attacks(self):
         """
         Note that function returns new positions of attacking piece not positions of piece being attacked!
         :return: list of all possible attacks ( example: [(0,1), (0,3)] )
         """
 
-        directions = self._possible_attack_direction()
+        directions = self._potential_attacks()
         return [(row, col) for row, col in directions if self._can_attack_to(row, col)]
 
     def _can_move_to(self, row_desired, column_desired):
         """
-        The function calling this should take care about moving the piece in allowed direction
+        Checks if man can move to desired place, it checks if its allowed move and if the place is on the board
         :param row_desired: destination to move
         :param column_desired: destination to move
         :return: true/false
         """
         if abs(row_desired - self.row) != 1 or abs(column_desired - self.column) != 1:
-            raise ValueError("Piece can be moved only diagonally")
+            raise ValueError("Piece can be moved only diagonally by 1 cell")
+
+        if (row_desired, column_desired) not in self._potential_moves():
+            raise ValueError("This piece can't be moved in this direction")
 
         if not is_allowed_cell_on_board(row_desired, column_desired):
             return False
 
-        if not self.board.is_empty(row_desired, column_desired):
+        if not self.board.there_is_any_piece_at(row_desired, column_desired):
             return False
         return True
 
@@ -107,30 +110,30 @@ class Man(Piece):
 
         if not is_allowed_cell_on_board(row_desired, column_desired):
             return False
-        if not self.board.is_empty(row_desired, column_desired):
+        if not self.board.there_is_any_piece_at(row_desired, column_desired):
             return False
 
         row_attacked = (self.row + row_desired) // 2
         column_attacked = (self.column + column_desired) // 2
 
-        piece_attacked = self.board.get_piece_at(row_attacked, column_attacked)
+        piece_we_attack = self.board.get_piece_at(row_attacked, column_attacked)
 
-        if not piece_attacked:
+        if not piece_we_attack:
             return False
 
-        if not self._is_different_color_than(piece_attacked):
+        if not self._is_different_color_than(piece_we_attack):
             return False
 
         return True
 
     @abstractmethod
-    def _possible_move_directions(self):
+    def _potential_moves(self):
         """Can't implement it here, because white can only move up, and black can only move down"""
         pass
 
-    def _possible_attack_direction(self):
-        Directions = namedtuple("Man_attack_directions", ["up_left", "up_right", "down_left", "down_right"])
-        return Directions((self.row - 2, self.column - 2), (self.row - 2, self.column + 2),
+    def _potential_attacks(self):
+        Potential_attacks = namedtuple("Man_potential_attacks", ["up_left", "up_right", "down_left", "down_right"])
+        return Potential_attacks((self.row - 2, self.column - 2), (self.row - 2, self.column + 2),
                           (self.row + 2, self.column - 2), (self.row + 2, self.column + 2))
 
 
@@ -145,10 +148,10 @@ class BlackMan(Man):
     def __str__(self):
         return "b"
 
-    def _possible_move_directions(self):
+    def _potential_moves(self):
         """Black are moving toward ascending row numbers"""
-        Directions = namedtuple("Black_man_move_directions", ["down_left", "down_right"])
-        return Directions((self.row + 1, self.column - 1), (self.row + 1, self.column + 1))
+        Moves = namedtuple("Black_man_potential_moves", ["down_left", "down_right"])
+        return Moves((self.row + 1, self.column - 1), (self.row + 1, self.column + 1))
 
 
 class WhiteMan(Man):
@@ -162,10 +165,10 @@ class WhiteMan(Man):
     def __str__(self):
         return "w"
 
-    def _possible_move_directions(self):
+    def _potential_moves(self):
         """Black are moving toward ascending row numbers"""
-        Directions = namedtuple("White_man_move_directions", ["up_left", "up_right"])
-        return Directions((self.row - 1, self.column - 1), (self.row - 1, self.column + 1))
+        Potential_moves = namedtuple("White_man_potential_moves", ["up_left", "up_right"])
+        return Potential_moves((self.row - 1, self.column - 1), (self.row - 1, self.column + 1))
 
 
 class King(Piece):

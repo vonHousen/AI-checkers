@@ -89,7 +89,7 @@ class Board:
                 result += 1.6
         return result
 
-    def is_empty(self, row, column):
+    def there_is_any_piece_at(self, row, column):
         if self.__board[row][column] is None:
             return True
         return False
@@ -124,7 +124,7 @@ def test_repr_gen():
 def test_man_moves():
     board = Board()
     for piece in board.pieces:
-        print(piece.list_possible_moves())
+        print(piece.possible_moves())
 
 
 def test_man_attacks():
@@ -141,12 +141,12 @@ def test_man_attacks():
     print(board)
 
     for piece in board.pieces:
-        listt = piece.list_possible_attacks()
-        if listt:
-            print(listt)
+        possible_attacks_list = piece.possible_attacks()
+        if possible_attacks_list:
+            print(possible_attacks_list)
 
 
 if __name__ == '__main__':
-    # test_repr_gen()
-    # test_man_moves()
+    test_repr_gen()
+    test_man_moves()
     test_man_attacks()
