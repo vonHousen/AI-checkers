@@ -80,11 +80,13 @@ class Man(Piece):
         self.column = column
         self.board = board
 
+    @property
     def possible_moves(self):
 
         directions = self._potential_moves()
         return [(row, col) for row, col in directions if self._can_move_to(row, col)]
 
+    @property
     def possible_attacks(self):
 
         directions = self._potential_attacks()
@@ -143,7 +145,7 @@ class Man(Piece):
         if not is_allowed_cell_on_board(row_desired, column_desired):
             return False
 
-        if not self.board.is_there_piece_at(row_desired, column_desired):
+        if self.board.is_there_piece_at(row_desired, column_desired):
             return False
         return True
 
