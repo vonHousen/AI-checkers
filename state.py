@@ -57,6 +57,8 @@ class State:
         else:
             raise RuntimeError("Moving piece do not exist")
 
+        changed_state._next_turn()
+
         return changed_state
 
     def _get_state_after_attack(self, row_current, column_current, row_after_attack, column_after_attack):
@@ -80,6 +82,8 @@ class State:
         else:
             raise RuntimeError("Attacking piece do not exist")
 
+        changed_state._next_turn()
+
         return changed_state
 
     def __str__(self):
@@ -97,7 +101,7 @@ class State:
     def print_next_states(self):
         if self._next_states:
             for next_state in self._next_states:
-                print("Balance = " + f'{next_state.board.balance}')
+                print("Balance = " + f'{next_state.board.balance}' + "   Turn = " + f'{next_state.turn}')
                 print(next_state)
         else:
             print("<There are no next states available>\n")
@@ -149,6 +153,16 @@ class State:
 
         return set_of_new_states
 
+    def _next_turn(self):
+        """
+        Changes turn of current state
+        :return: -
+        """
+        if self.turn == Color.BLACK:
+            self.turn = Color.WHITE
+        else:
+            self.turn = Color.BLACK
+
 
 def test_simple_attack():
     board_r = (0x8a8a8a8a,
@@ -190,3 +204,4 @@ def test_generating_attacks():
 
 if __name__ == '__main__':
     test_generating_attacks()
+
