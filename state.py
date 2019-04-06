@@ -68,13 +68,13 @@ class State:
 
         return changed_state
 
-    def get_state_after_attack(self, row_current, column_current, row_attacked, column_attacked):
+    def get_state_after_attack(self, row_current, column_current, row_after_attack, column_after_attack):
         """
 
         :param row_current: current location of a piece to move
         :param column_current: current location of a piece to move
-        :param row_attacked: destination to attack
-        :param column_attacked: destination to attack
+        :param row_after_attack: location after attack
+        :param column_after_attack: location after attack
         :return: new state (deep copy) generated due to the attack
         """
 
@@ -84,7 +84,7 @@ class State:
 
         if changed_board.is_there_piece_at(row_current, column_current):
             attacking_piece = changed_board.get_piece_at(row_current, column_current)
-            attacking_piece.attack_it(row_attacked, column_attacked)
+            attacking_piece.attack_to(row_after_attack, column_after_attack)
 
         else:
             raise RuntimeError("Attacking piece do not exist")
@@ -155,7 +155,7 @@ def test_attack_board():
     board = Board(board_r)
     state = State(board, Color.WHITE)
     print(state.board)
-    print(state.get_state_after_attack(5, 2, 4, 1))
+    print(state.get_state_after_attack(5, 2, 3, 0))
     print(state.board)  # should be the first board itself (unchanged)
     state.clean_cached_board()
 

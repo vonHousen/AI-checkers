@@ -53,7 +53,7 @@ class Piece:
     @abstractmethod
     def possible_attacks(self):
         """
-        Note that function returns positions of piece being attacked!
+        Note that function returns positions of piece after performing an attack!
         :return: list of all possible attacks ( example: [(0,1), (0,3)] ) - attacks are tuples (row,column)
         """
         pass
@@ -63,7 +63,7 @@ class Piece:
         pass
 
     @abstractmethod
-    def attack_it(self, row_attacked, column_attacked):
+    def attack_to(self, row_after_attack, column_after_attack):
         pass
 
     def _is_different_color_than(self, piece):
@@ -83,12 +83,12 @@ class Man(Piece):
     def possible_moves(self):
 
         directions = self._potential_moves()
-        return [(row, col) for row, col in directions if self.can_move_to(row, col)]
+        return [(row, col) for row, col in directions if self._can_move_to(row, col)]
 
     def possible_attacks(self):
 
         directions = self._potential_attacks()
-        return [(row, col) for row, col in directions if self.can_attack_it(row, col)]
+        return [(row, col) for row, col in directions if self._can_attack_to(row, col)]
 
     def move_to(self, row_desired, column_desired):
 
@@ -115,16 +115,16 @@ class Man(Piece):
             self.row = row_desired
             self.column = column_desired
 
-    def attack_it(self, row_attacked, column_attacked):
+    def attack_to(self, row_after_attack, column_after_attack):
 
-        if not self._can_attack_it(row_attacked, column_attacked):
+        row_attacked = (row_after_attack + self.row) // 2
+        column_attacked = (column_after_attack + self.column) // 2
+
+        if not self._can_attack_to(row_after_attack, column_after_attack):
             raise RuntimeError("Attack not allowed")
 
         else:
-            row_at_end = 2*row_attacked - self.row
-            column_at_end = 2*column_attacked - self.column
-
-            self._move_unsafely_to(row_at_end, column_at_end)
+            self._move_unsafely_to(row_after_attack, column_after_attack)
             self.board.delete_piece_at(row_attacked, column_attacked)
 
     def _can_move_to(self, row_desired, column_desired):
@@ -147,20 +147,20 @@ class Man(Piece):
             return False
         return True
 
-    def _can_attack_it(self, row_attacked, column_attacked):
+    def _can_attack_to(self, row_after_attack, column_after_attack):
         """
-        :param row_attacked: attacked location
-        :param column_attacked: attacked location
+        :param row_after_attack: location after an attack
+        :param column_after_attack: location after an attack
         :return: true/false
         """
 
-        row_at_end = 2*row_attacked - self.row
-        column_at_end = 2*column_attacked - self.column
+        if not is_allowed_cell_on_board(row_after_attack, column_after_attack):
+            return False
+        if self.board.is_there_piece_at(row_after_attack, column_after_attack):
+            return False
 
-        if not is_allowed_cell_on_board(row_at_end, column_at_end):
-            return False
-        if self.board.is_there_piece_at(row_at_end, column_at_end):
-            return False
+        row_attacked = (row_after_attack + self.row) // 2
+        column_attacked = (column_after_attack + self.column) // 2
 
         piece_we_attack = self.board.get_piece_at(row_attacked, column_attacked)
 
@@ -179,8 +179,8 @@ class Man(Piece):
 
     def _potential_attacks(self):
         Potential_attacks = namedtuple("Man_potential_attacks", ["up_left", "up_right", "down_left", "down_right"])
-        return Potential_attacks((self.row - 1, self.column - 1), (self.row - 1, self.column + 1),
-                                 (self.row + 1, self.column - 1), (self.row + 1, self.column + 1))
+        return Potential_attacks((self.row - 2, self.column - 2), (self.row - 2, self.column + 2),
+                                 (self.row + 2, self.column - 2), (self.row + 2, self.column + 2))
 
 
 class BlackMan(Man):
