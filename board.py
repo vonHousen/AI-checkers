@@ -104,16 +104,21 @@ class Board:
         (self.__board[row][column]) = piece
 
     def __str__(self):
-        result = ""
-        for row in self.__board:
+        result = "   "
+        for i in range(8):
+            result += f"{i} "
+        result += "\n"
 
-            result += "| "
+        row_count = 0
+        for row in self.__board:
+            result += f"{row_count}| "
             for piece in row:
                 if piece is None:
                     result += "." + " "
                 else:
                     result += f'{piece}' + " "
             result += "|" + "\n"
+            row_count += 1
         return result
 
 
@@ -130,7 +135,10 @@ def test_repr_gen():
 def test_man_moves():
     board = Board()
     for piece in board.pieces:
-        print(piece.possible_moves())
+        moves = piece.possible_moves
+        if moves:
+            print(f"{piece}({piece.row},{piece.column}) -> ", end="")
+            print(moves)
 
 
 def test_man_attacks():
@@ -147,12 +155,85 @@ def test_man_attacks():
     print(board)
 
     for piece in board.pieces:
-        possible_attacks_list = piece.possible_attacks()
+        possible_attacks_list = piece.possible_attacks
         if possible_attacks_list:
+            print(f"{piece}({piece.row},{piece.column}) -> ", end="")
             print(possible_attacks_list)
+
+
+def test_king_moves():
+    board_repr = (0x88888888,
+                  0x88888888,
+                  0x88888888,
+                  0x8888b888,
+                  0x88838888,
+                  0x88888888,
+                  0x88888888,
+                  0x88888888
+                  )
+    board = Board(board_repr)
+    print(board)
+
+    for piece in board.pieces:
+        possible_moves_list = piece.possible_moves
+        if possible_moves_list:
+            print(f"{piece}({piece.row},{piece.column}) -> ", end="")
+            print(possible_moves_list)
+            # for row, col in possible_moves_list:
+            #     piece.board.set_piece_at(row, col, "x")
+    piece = board.pieces[0]
+    row, col = piece.possible_moves[0]
+    piece.move_to(row , col)
+    print(board)
+
+
+def test_king_attacks():
+    board_repr = (0x88888888,
+                  0x88888888,
+                  0x88888888,
+                  0x8888b888,
+                  0x88838888,
+                  0x88888838,
+                  0x82888888,
+                  0x88888888
+                  )
+    board = Board(board_repr)
+    print(board)
+
+    for piece in board.pieces:
+        possible_moves_list = piece.possible_attacks
+        if possible_moves_list:
+            print(f"{piece}({piece.row},{piece.column}) -> ", end="")
+            print(possible_moves_list)
+    piece = board.pieces[0]
+    row, col = piece.possible_attacks[0]
+    piece.attack_to(row, col)
+    print(board)
+
+
+def test_replace_with_king():
+    board_repr = (0x82828a8a,
+                  0xa8a8a8a8,
+                  0x8a8a8a8a,
+                  0x88288888,
+                  0x88888a88,
+                  0x28282828,
+                  0x82828282,
+                  0x28a828a8
+                  )
+    board = Board(board_repr)
+    print(board)
+    for piece in board.pieces:
+        if piece.can_be_replaced_with_king():
+            piece.replace_with_king()
+
+    print(board)
 
 
 if __name__ == '__main__':
     test_repr_gen()
     test_man_moves()
     test_man_attacks()
+    test_king_moves()
+    test_king_attacks()
+    test_replace_with_king()
