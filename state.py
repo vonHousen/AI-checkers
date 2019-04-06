@@ -48,8 +48,8 @@ class State:
         # copy self.state and change it's copy
         changed_state = copy.deepcopy(self.board)
 
-        if not changed_state.there_is_piece_at(row_desired, column_desired) \
-                and changed_state.there_is_piece_at(row_current, column_current) \
+        if not changed_state.is_there_piece_at(row_desired, column_desired) \
+                and changed_state.is_there_piece_at(row_current, column_current) \
                 and 8 > row_desired >= 0 \
                 and 8 > column_desired >= 0:
             # change piece's location

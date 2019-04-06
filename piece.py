@@ -1,4 +1,4 @@
-from abc import abstractmethod, abstractproperty
+from abc import abstractmethod
 from enum import Enum
 from collections import namedtuple
 
@@ -38,7 +38,8 @@ class Piece:
             return True
         return False
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def color(self):
         pass
 
@@ -120,7 +121,7 @@ class Man(Piece):
         if not is_allowed_cell_on_board(row_desired, column_desired):
             return False
 
-        if not self.board.there_is_piece_at(row_desired, column_desired):
+        if not self.board.is_there_piece_at(row_desired, column_desired):
             return False
         return True
 
@@ -133,7 +134,7 @@ class Man(Piece):
 
         if not is_allowed_cell_on_board(row_desired, column_desired):
             return False
-        if not self.board.there_is_piece_at(row_desired, column_desired):
+        if not self.board.is_there_piece_at(row_desired, column_desired):
             return False
 
         row_attacked = (self.row + row_desired) // 2

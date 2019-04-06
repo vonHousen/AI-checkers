@@ -89,7 +89,7 @@ class Board:
                 result += 1.6
         return result
 
-    def there_is_piece_at(self, row, column):
+    def is_there_piece_at(self, row, column):
         if self.__board[row][column] is None:
             return True
         return False
