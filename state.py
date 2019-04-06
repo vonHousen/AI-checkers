@@ -4,33 +4,24 @@ import copy
 
 class State:
 
-    #def __init__(self, next_turn=Color.WHITE, board_repr=(0x8a8a8a8a,
-    #                                                      0xa8a8a8a8,
-    #                                                      0x8a8a8a8a,
-    #                                                      0x88888888,
-    #                                                      0x88888888,
-    #                                                      0x28282828,
-    #                                                      0x82828282,
-    #                                                      0x28282828
-    #                                                      )):
-    #    self.turn = next_turn
-    #    # 8 not allowed or empty
-    #    # 2 white man
-    #    # 3 white king
-    #    # a black man
-    #    # b black king
-    #    self.board_repr = board_repr
-    #    self._cached_board = None
-
-    def __init__(self, board, next_turn=Color.WHITE):
+    def __init__(self, next_turn=Color.WHITE, board_repr=(0x8a8a8a8a,
+                                                          0xa8a8a8a8,
+                                                          0x8a8a8a8a,
+                                                          0x88888888,
+                                                          0x88888888,
+                                                          0x28282828,
+                                                          0x82828282,
+                                                          0x28282828
+                                                          )):
         self.turn = next_turn
         # 8 not allowed or empty
         # 2 white man
         # 3 white king
         # a black man
         # b black king
-        self._cached_board = board
-        self.board_repr = board.board_repr
+        self.board_repr = board_repr
+        self._cached_board = None
+        self._next_states = []
 
     @property
     def board(self):
@@ -45,7 +36,7 @@ class State:
     def clean_cached_board(self):
         self._cached_board = None
 
-    def get_state_after_movement(self, row_current, column_current, row_desired, column_desired):
+    def _get_state_after_movement(self, row_current, column_current, row_desired, column_desired):
         """
         Universal method to move one piece from curr loc to desired. It's not validating movements!
         :param row_current: current location of a piece to move
@@ -68,7 +59,7 @@ class State:
 
         return changed_state
 
-    def get_state_after_attack(self, row_current, column_current, row_after_attack, column_after_attack):
+    def _get_state_after_attack(self, row_current, column_current, row_after_attack, column_after_attack):
         """
 
         :param row_current: current location of a piece to move
@@ -94,55 +85,72 @@ class State:
     def __str__(self):
         return self.board.__str__()
 
-    # TODO adjust functions below after moving from game.py
-    # def print_set(self, no_set_of_states):
-    #     """
+    @property
+    def get_next_states(self):
+        """
 
-    #     :param no_set_of_states: number of the set of states to be printed
-    #     :return: -
-    #     """
+        :return: set of next states
+        """
 
-    #     # TODO move to states
-    #     if self.states.__len__() > no_set_of_states >= 0:
-    #         for no, state in enumerate(self.states[no_set_of_states]):
-    #             print("set_of_states: " + f'{no_set_of_states}' + " | state no: " + f'{no}')
-    #             print(state)
+        return self._next_states
 
-    # def generate_next_states(self, turn):
-    #     """
-    #     Generates all possible states generated from the last one (appends to self.states)
-    #     :param turn: decides what turn (what color) it is for generating new states
-    #     :return: -
-    #     """
-    #     # TODO move to State
-    #
-    #     last_state = self.states[-1][0]  # it should be parent in the tree structure
-    #     self.states.append([])  # new set_of_states
-    #
-    #     for piece in last_state.board.get_pieces_of_color(turn):
-    #
-    #         if piece.can_attack():
-    #             for destination in piece.list_possible_attacks:
-    #                 attacker_row = piece.row
-    #                 attacker_col = piece.column
-    #
-    #                 self.states[-1].append(
-    #                     last_state.get_state_after_attack(attacker_row, attacker_col, destination[0], destination[1]))
-    #
-    #                 # TODO if just appended state result in multiple-attack: append new states, delete prev.
-    #                 # TODO make it recursive (no one knows how many multiple-attacks a piece can perform
-    #
-    #         elif piece.can_move():
-    #             for destination in piece.list_possible_moves:
-    #                 self.states[-1].append(
-    #                     last_state.get_state_after_movement(piece.row, piece.column, destination[0], destination[1]))
-    #
-    #     if self.states[-1] == []:  # delete set_of_state if empty
-    #    del self.states[-1]
-    #
+    def print_next_states(self):
+        if self._next_states:
+            for next_state in self._next_states:
+                print("Balance = " + f'{next_state.board.balance}')
+                print(next_state)
+        else:
+            print("<There are no next states available>\n")
+
+    def generate_next_states(self):
+        """
+        Generates all possible states generated from the current one (appends to self._next_states)
+        :return: -
+        """
+        set_of_new_states = []
+
+        for piece in self.board.get_pieces_of_color(self.turn):
+            if piece.possible_attacks:
+
+                set_of_new_sub_states = self._generate_next_states_during_attack(piece)
+                for new_sub_state in set_of_new_sub_states:
+                    set_of_new_states.append(new_sub_state)
+
+            else:
+                for after_move_loc in piece.possible_moves:
+                    self._next_states.append(
+                        self._get_state_after_movement(piece.row, piece.column, after_move_loc[0], after_move_loc[1]))
+
+        for new_state in set_of_new_states:
+            self._next_states.append(new_state)
+
+    def _generate_next_states_during_attack(self, piece):
+        """
+        Generates all possible states generated from the current one for given piece
+        Used only during multiple-attack
+        :return: set of new states
+        """
+        set_of_new_states = []
+
+        for after_attack_loc in piece.possible_attacks:
+
+            new_state = \
+                self._get_state_after_attack(piece.row, piece.column, after_attack_loc[0], after_attack_loc[1])
+            set_of_new_states.append(new_state)
+
+            # if just appended state result in multiple-attack: append new states, delete prev.
+            attacking_piece = new_state.board.get_piece_at(after_attack_loc[0], after_attack_loc[1])
+            if attacking_piece.possible_attacks:
+
+                set_of_new_states.pop()
+                set_of_new_sub_states = new_state._generate_next_states_during_attack(attacking_piece)
+                for new_sub_state in set_of_new_sub_states:
+                    set_of_new_states.append(new_sub_state)
+
+        return set_of_new_states
 
 
-def test_attack_board():
+def test_simple_attack():
     board_r = (0x8a8a8a8a,
                0xa8a8a8a8,
                0x888a8a8a,
@@ -152,32 +160,33 @@ def test_attack_board():
                0x82828282,
                0x28282828
                )
-    board = Board(board_r)
-    state = State(board, Color.WHITE)
+    state = State(Color.WHITE, board_r)
     print(state.board)
-    print(state.get_state_after_attack(5, 2, 3, 0))
+    print(state._get_state_after_attack(5, 2, 3, 0))
     print(state.board)  # should be the first board itself (unchanged)
     state.clean_cached_board()
 
 
-def test_man_attacks():
-    board_repr = (0x8a8a8a8a,
-                  0xa8a8a8a8,
-                  0x8a8a8a8a,
-                  0x88288888,
-                  0x88888a88,
-                  0x28282828,
-                  0x82828282,
-                  0x28282828
-                  )
-    board = Board(board_repr)
-    print(board)
+def test_generating_attacks():
+    board_r = (0x8a8a8a8a,
+               0xa888a8a8,
+               0x8a8a8a8a,
+               0x88888888,
+               0x8a888888,
+               0x28282828,
+               0x82828282,
+               0x28282828
+               )
+    state = State(Color.WHITE, board_r)
+    print(state.board)
 
-    for piece in board.pieces:
-        possible_attacks_list = piece.possible_attacks()
-        if possible_attacks_list:
-            print(possible_attacks_list)
+    for attack in state.board.get_piece_at(0, 1).possible_attacks:
+        print(attack)
+
+    state.print_next_states()
+    state.generate_next_states()
+    state.print_next_states()
 
 
 if __name__ == '__main__':
-    test_attack_board()
+    test_generating_attacks()

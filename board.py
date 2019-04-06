@@ -66,11 +66,11 @@ class Board:
         """
         return [piece for row in self.__board for piece in row if piece is not None]
 
-    def get_pieces_of_color(self, colour):
+    def get_pieces_of_color(self, color):
         """
-        :return: List of pieces on the board of specific colour
+        :return: List of pieces on the board of specific color
         """
-        return [piece for row in self.__board for piece in row if (piece is not None and piece.colour == colour)]
+        return [piece for row in self.__board for piece in row if (piece is not None and piece.color == color)]
 
     @property
     def balance(self):
