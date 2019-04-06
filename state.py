@@ -95,8 +95,10 @@ class State:
         return self._next_states
 
     def print_next_states(self):
-        for next_state in self._next_states:
-            print(next_state)
+        if self._next_states:
+            for next_state in self._next_states:
+                print("Balance = " + f'{next_state.board.balance}')
+                print(next_state)
         else:
             print("<There are no next states available>\n")
 
@@ -108,20 +110,11 @@ class State:
         set_of_new_states = []
 
         for piece in self.board.get_pieces_of_color(self.turn):
-            for after_attack_loc in piece.possible_attacks:
+            if piece.possible_attacks:
 
-                new_state = \
-                    self._get_state_after_attack(piece.row, piece.column, after_attack_loc[0], after_attack_loc[1])
-                set_of_new_states.append(new_state)
-
-                # if just appended state result in multiple-attack: append new states, delete prev.
-                attacking_piece = new_state.board.get_piece_at(after_attack_loc[0], after_attack_loc[1])
-                if attacking_piece.possible_attacks != []:
-
-                    set_of_new_states.pop()
-                    set_of_new_sub_states = new_state._generate_next_states_during_attack(attacking_piece)
-                    for new_sub_state in set_of_new_sub_states:
-                        set_of_new_states.append(new_sub_state)
+                set_of_new_sub_states = self._generate_next_states_during_attack(piece)
+                for new_sub_state in set_of_new_sub_states:
+                    set_of_new_states.append(new_sub_state)
 
             else:
                 for after_move_loc in piece.possible_moves:
@@ -147,7 +140,7 @@ class State:
 
             # if just appended state result in multiple-attack: append new states, delete prev.
             attacking_piece = new_state.board.get_piece_at(after_attack_loc[0], after_attack_loc[1])
-            if attacking_piece.possible_attacks != []:
+            if attacking_piece.possible_attacks:
 
                 set_of_new_states.pop()
                 set_of_new_sub_states = new_state._generate_next_states_during_attack(attacking_piece)
