@@ -91,8 +91,8 @@ class Board:
 
     def is_there_piece_at(self, row, column):
         if self.__board[row][column] is None:
-            return True
-        return False
+            return False
+        return True
 
     def get_piece_at(self, row, column):
         return self.__board[row][column]

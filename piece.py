@@ -92,21 +92,42 @@ class Man(Piece):
 
     def move_to(self, row_desired, column_desired):
 
-        self.board.delete_piece_at(self.row, self.column)
-        self.board.set_piece_at(row_desired, column_desired, self)
+        if not self._can_move_to(row_desired, column_desired):
+            raise RuntimeError("Movement not allowed")
 
-        self.row = row_desired
-        self.column = column_desired
+        else:
+            self.board.delete_piece_at(self.row, self.column)
+            self.board.set_piece_at(row_desired, column_desired, self)
+
+            self.row = row_desired
+            self.column = column_desired
+
+    def _move_unsafely_to(self, row_desired, column_desired):
+
+        if not is_allowed_cell_on_board(row_desired, column_desired) \
+                or self.board.is_there_piece_at(row_desired, column_desired):
+            raise RuntimeError("Movement during an attack not allowed")
+
+        else:
+            self.board.delete_piece_at(self.row, self.column)
+            self.board.set_piece_at(row_desired, column_desired, self)
+
+            self.row = row_desired
+            self.column = column_desired
 
     def attack_it(self, row_attacked, column_attacked):
 
-        row_at_end = 2*row_attacked - self.row
-        column_at_end = 2*column_attacked - self.column
+        if not self._can_attack_it(row_attacked, column_attacked):
+            raise RuntimeError("Attack not allowed")
 
-        self.move_to(row_at_end, column_at_end)
-        self.board.delete_piece_at(row_attacked, column_attacked)
+        else:
+            row_at_end = 2*row_attacked - self.row
+            column_at_end = 2*column_attacked - self.column
 
-    def can_move_to(self, row_desired, column_desired):
+            self._move_unsafely_to(row_at_end, column_at_end)
+            self.board.delete_piece_at(row_attacked, column_attacked)
+
+    def _can_move_to(self, row_desired, column_desired):
         """
         Checks if man can move to desired place, it checks if its allowed move and if the place is on the board
         :param row_desired: destination to move
@@ -126,7 +147,7 @@ class Man(Piece):
             return False
         return True
 
-    def can_attack_it(self, row_attacked, column_attacked):
+    def _can_attack_it(self, row_attacked, column_attacked):
         """
         :param row_attacked: attacked location
         :param column_attacked: attacked location
@@ -138,7 +159,7 @@ class Man(Piece):
 
         if not is_allowed_cell_on_board(row_at_end, column_at_end):
             return False
-        if not self.board.is_there_piece_at(row_at_end, column_at_end):
+        if self.board.is_there_piece_at(row_at_end, column_at_end):
             return False
 
         piece_we_attack = self.board.get_piece_at(row_attacked, column_attacked)

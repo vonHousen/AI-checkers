@@ -59,13 +59,12 @@ class State:
         changed_state = copy.deepcopy(self)
         changed_board = changed_state.board
 
-        if not changed_board.is_there_piece_at(row_desired, column_desired) \
-                and changed_board.is_there_piece_at(row_current, column_current):
-
-            # change piece's location
-
+        if changed_board.is_there_piece_at(row_current, column_current):
             moved_piece = changed_board.get_piece_at(row_current, column_current)
             moved_piece.move_to(row_desired, column_desired)
+
+        else:
+            raise RuntimeError("Moving piece do not exist")
 
         return changed_state
 
@@ -82,10 +81,13 @@ class State:
         # copy self.state and change it's copy
         changed_state = copy.deepcopy(self)
         changed_board = changed_state.board
-        attacking_piece = changed_board.get_piece_at(row_current, column_current)
 
-        if attacking_piece.can_attack_it(row_attacked, column_attacked):
+        if changed_board.is_there_piece_at(row_current, column_current):
+            attacking_piece = changed_board.get_piece_at(row_current, column_current)
             attacking_piece.attack_it(row_attacked, column_attacked)
+
+        else:
+            raise RuntimeError("Attacking piece do not exist")
 
         return changed_state
 
