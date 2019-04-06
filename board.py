@@ -97,8 +97,11 @@ class Board:
     def get_piece_at(self, row, column):
         return self.__board[row][column]
 
-    def delete_piece_at(self,row,column):
-        self.__board[row][column] = None
+    def delete_piece_at(self, row, column):
+        (self.__board[row][column]) = None
+
+    def set_piece_at(self, row, column, piece):
+        (self.__board[row][column]) = piece
 
     def __str__(self):
         result = ""

@@ -4,23 +4,33 @@ import copy
 
 class State:
 
-    def __init__(self, next_turn=Color.WHITE, board_repr=(0x8a8a8a8a,
-                                                          0xa8a8a8a8,
-                                                          0x8a8a8a8a,
-                                                          0x88888888,
-                                                          0x88888888,
-                                                          0x28282828,
-                                                          0x82828282,
-                                                          0x28282828
-                                                          )):
+    #def __init__(self, next_turn=Color.WHITE, board_repr=(0x8a8a8a8a,
+    #                                                      0xa8a8a8a8,
+    #                                                      0x8a8a8a8a,
+    #                                                      0x88888888,
+    #                                                      0x88888888,
+    #                                                      0x28282828,
+    #                                                      0x82828282,
+    #                                                      0x28282828
+    #                                                      )):
+    #    self.turn = next_turn
+    #    # 8 not allowed or empty
+    #    # 2 white man
+    #    # 3 white king
+    #    # a black man
+    #    # b black king
+    #    self.board_repr = board_repr
+    #    self._cached_board = None
+
+    def __init__(self, board, next_turn=Color.WHITE):
         self.turn = next_turn
         # 8 not allowed or empty
         # 2 white man
         # 3 white king
         # a black man
         # b black king
-        self.board_repr = board_repr
-        self._cached_board = None
+        self._cached_board = board
+        self.board_repr = board.board_repr
 
     @property
     def board(self):
@@ -37,25 +47,25 @@ class State:
 
     def get_state_after_movement(self, row_current, column_current, row_desired, column_desired):
         """
-        Universal method to move one piece from curr loc to desired. It's not validating movements for generalization!
+        Universal method to move one piece from curr loc to desired. It's not validating movements!
         :param row_current: current location of a piece to move
         :param column_current: current location of a piece to move
         :param row_desired: desired destination to move to
         :param column_desired: desired destination to move to
         :return: new state (deepcopy) generated due to the movement
         """
-        # todo w tej funkcji jest pewna niespojność, zwraca ona obiekt klasy board nie state
-        # copy self.state and change it's copy
-        changed_state = copy.deepcopy(self.board)
 
-        if not changed_state.is_there_piece_at(row_desired, column_desired) \
-                and changed_state.is_there_piece_at(row_current, column_current) \
-                and 8 > row_desired >= 0 \
-                and 8 > column_desired >= 0:
+        # copy self.state and change it's copy
+        changed_state = copy.deepcopy(self)
+        changed_board = changed_state.board
+
+        if not changed_board.is_there_piece_at(row_desired, column_desired) \
+                and changed_board.is_there_piece_at(row_current, column_current):
+
             # change piece's location
 
-            piece = changed_state.get_piece_at(row_current, column_current)
-            piece.move_to(row_desired, column_desired)
+            moved_piece = changed_board.get_piece_at(row_current, column_current)
+            moved_piece.move_to(row_desired, column_desired)
 
         return changed_state
 
@@ -69,20 +79,13 @@ class State:
         :return: new state (deep copy) generated due to the attack
         """
 
-        changed_state = copy.deepcopy(self.board)  # possibly unnecessary
+        # copy self.state and change it's copy
+        changed_state = copy.deepcopy(self)
+        changed_board = changed_state.board
+        attacking_piece = changed_board.get_piece_at(row_current, column_current)
 
-        if changed_state.__board[row_current][column_current] is Man:  # TODO use isInstance() (each time)
-            dx = row_attacked - row_current  # -1 / +1
-            dy = column_attacked - column_current  # -1 / +1
-
-            changed_state = self.get_state_after_movement(row_current,
-                                                          column_current,
-                                                          row_current + 2 * dx,
-                                                          column_current + 2 * dy)
-            changed_state.__board[row_attacked][column_attacked] = None
-
-        elif changed_state.__board[row_current][column_current] is King:
-            pass  # TODO implement!
+        if attacking_piece.can_attack_it(row_attacked, column_attacked):
+            attacking_piece.attack_it(row_attacked, column_attacked)
 
         return changed_state
 
@@ -147,11 +150,31 @@ def test_attack_board():
                0x82828282,
                0x28282828
                )
-    state = State(Color.WHITE, board_r)
+    board = Board(board_r)
+    state = State(board, Color.WHITE)
     print(state.board)
     print(state.get_state_after_attack(5, 2, 4, 1))
     print(state.board)  # should be the first board itself (unchanged)
     state.clean_cached_board()
+
+
+def test_man_attacks():
+    board_repr = (0x8a8a8a8a,
+                  0xa8a8a8a8,
+                  0x8a8a8a8a,
+                  0x88288888,
+                  0x88888a88,
+                  0x28282828,
+                  0x82828282,
+                  0x28282828
+                  )
+    board = Board(board_repr)
+    print(board)
+
+    for piece in board.pieces:
+        possible_attacks_list = piece.possible_attacks()
+        if possible_attacks_list:
+            print(possible_attacks_list)
 
 
 if __name__ == '__main__':
