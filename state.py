@@ -4,33 +4,23 @@ import copy
 
 class State:
 
-    #def __init__(self, next_turn=Color.WHITE, board_repr=(0x8a8a8a8a,
-    #                                                      0xa8a8a8a8,
-    #                                                      0x8a8a8a8a,
-    #                                                      0x88888888,
-    #                                                      0x88888888,
-    #                                                      0x28282828,
-    #                                                      0x82828282,
-    #                                                      0x28282828
-    #                                                      )):
-    #    self.turn = next_turn
-    #    # 8 not allowed or empty
-    #    # 2 white man
-    #    # 3 white king
-    #    # a black man
-    #    # b black king
-    #    self.board_repr = board_repr
-    #    self._cached_board = None
-
-    def __init__(self, board, next_turn=Color.WHITE):
+    def __init__(self, next_turn=Color.WHITE, board_repr=(0x8a8a8a8a,
+                                                          0xa8a8a8a8,
+                                                          0x8a8a8a8a,
+                                                          0x88888888,
+                                                          0x88888888,
+                                                          0x28282828,
+                                                          0x82828282,
+                                                          0x28282828
+                                                          )):
         self.turn = next_turn
         # 8 not allowed or empty
         # 2 white man
         # 3 white king
         # a black man
         # b black king
-        self._cached_board = board
-        self.board_repr = board.board_repr
+        self.board_repr = board_repr
+        self._cached_board = None
 
     @property
     def board(self):
@@ -152,8 +142,7 @@ def test_attack_board():
                0x82828282,
                0x28282828
                )
-    board = Board(board_r)
-    state = State(board, Color.WHITE)
+    state = State(Color.WHITE, board_r)
     print(state.board)
     print(state.get_state_after_attack(5, 2, 3, 0))
     print(state.board)  # should be the first board itself (unchanged)
