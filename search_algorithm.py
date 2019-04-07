@@ -132,14 +132,14 @@ def test_alpha_beta():
 
 
 def test_kings():
-    board_r = (0x83888a8a,
+    board_r = (0x88838888,
                0x88888888,
                0x88888888,
                0x88888888,
                0x888a8888,
                0x88888888,
                0x88888288,
-               0x28288888)
+               0x88888888)
     state = State(Color.WHITE, board_r)
     print(40 * "-")
     print("Root state:")
@@ -147,7 +147,34 @@ def test_kings():
     print(40 * "-")
     start_time = time.time()
 
-    result = SearchAlgorithm.min_max(state, 3)
+    result = SearchAlgorithm.alpha_beta(state, 3, -999999, 999999)
+
+    end_time = time.time()
+    print(40 * "-")
+    print("Final sequence:")
+    state.print_final_sequence()
+    print()
+    print(40 * "-")
+    print("alpha_beta time [s]: " + f'{end_time - start_time}')
+
+
+def test_becoming_kings():
+    board_r = (0x88888888,
+               0x28888888,
+               0x88888888,
+               0x88888888,
+               0x88888888,
+               0x8888a888,
+               0x88888288,
+               0x88888888)
+    state = State(Color.BLACK, board_r)
+    print(40 * "-")
+    print("Root state:")
+    print(state)
+    print(40 * "-")
+    start_time = time.time()
+
+    result = SearchAlgorithm.alpha_beta(state, 6, -999999, 999999)
 
     end_time = time.time()
     print(40 * "-")
@@ -159,5 +186,5 @@ def test_kings():
 
 
 if __name__ == '__main__':
-    test_kings()
+    test_becoming_kings()
 
