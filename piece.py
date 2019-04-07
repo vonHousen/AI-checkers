@@ -89,6 +89,10 @@ class Piece(ABC):
         self._move_unsafely_to(row_desired, column_desired)
         self.board.delete_piece_at(row_attacked, column_attacked)
 
+    @abstractmethod
+    def get_representation(self):
+        pass
+
     def _move_unsafely_to(self, row_desired, column_desired):
 
         self.board.delete_piece_at(self.row, self.column)
@@ -233,6 +237,9 @@ class BlackMan(Man):
             return True
         return False
 
+    def get_representation(self):
+        return 0x0000000a
+
     def _potential_moves(self):
         """Black are moving toward ascending row numbers"""
         return [(self.row + 1, self.column - 1), (self.row + 1, self.column + 1)]
@@ -253,6 +260,9 @@ class WhiteMan(Man):
         if self.row is 0:
             return True
         return False
+
+    def get_representation(self):
+        return 0x00000002
 
     def _potential_moves(self):
         """Black are moving toward ascending row numbers"""
@@ -289,6 +299,9 @@ class WhiteKing(King):
     def color(self):
         return Color.WHITE
 
+    def get_representation(self):
+        return 0x00000003
+
 
 class BlackKing(King):
     def __init__(self, row, column, board):
@@ -300,3 +313,6 @@ class BlackKing(King):
     @property
     def color(self):
         return Color.BLACK
+
+    def get_representation(self):
+        return 0x0000000b
