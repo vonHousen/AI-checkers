@@ -3,14 +3,15 @@ from search_algorithm import SearchAlgorithm
 
 
 class Game:
-    def __init__(self):
-        self.current_state = State()  # root for tree structure of States
+    def __init__(self, depth):
+        self.current_state = State()
+        self.depth = depth
 
     def make_move(self):
         if self.is_finished():
             raise RuntimeError("Making moves in a finished game")
         print("Starting alpha_beta")
-        SearchAlgorithm.alpha_beta(self.current_state, 8)
+        SearchAlgorithm.alpha_beta(self.current_state, self.depth)
         next_state = self.current_state.next_move
         # print("XD")
         # print(next_state._board)
@@ -22,10 +23,25 @@ class Game:
         return False
 
 
-if __name__ == '__main__':
-    game = Game()
+def run_game():
+    while True:
+        try:
+            depth = int(input("Give me the depth you want to search:\n"))
+        except ValueError:
+            print("Try harder pls.")
+        else:
+            break
+    game = Game(depth)
     print(game.current_state)
     while game.is_finished() is False:
         game.make_move()
         print(game.current_state)
-        input("Press key to continue...")
+        # i = input("If you want to see how the decision will be made type 'd', else press enter")
+        # print(i)
+        # if i is "d":
+        # game.current_state.print_final_sequence() todo fix thix xd
+        input("press enter")
+
+
+if __name__ == '__main__':
+    run_game()

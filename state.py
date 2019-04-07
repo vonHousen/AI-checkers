@@ -127,7 +127,6 @@ class State:
         for piece in self._board.get_pieces_of_color(self.turn):
             if piece.can_attack_anywhere():
                 return True
-
         return False
 
     def __str__(self):
