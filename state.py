@@ -24,9 +24,16 @@ class State:
         self._cached_board = None
         self.next_states = []
         self.next_move = None
+        self._value = None
 
     @property
-    def board(self):
+    def value(self):
+        if self._value is None:
+            self._value = self._board.balance
+        return self._value
+
+    @property
+    def _board(self):
         """
         Cache new Board object (using stored representation) if it doesn't exist
         :return: Cached or just created Board object
@@ -41,10 +48,31 @@ class State:
         :return: true/false
         """
         # TODO implement checking if one color is out of moves
-        if not self.board.get_pieces_of_color(Color.WHITE) or not self.board.get_pieces_of_color(Color.BLACK):
+        white_pieces = self._board.get_pieces_of_color(Color.WHITE)
+        black_pieces = self._board.get_pieces_of_color(Color.BLACK)
+        if not white_pieces or not black_pieces:  # if any of them dont have pieces left
             return True
-        else:
-            return False
+
+        # check if there's any move or attack black can perform
+        found_black_move_or_attack = False
+        for piece in black_pieces:
+            if piece.possible_attacks or piece.possible_moves:
+                found_black_move_or_attack = True
+                break
+        if found_black_move_or_attack is False:
+            return True
+
+        # check if there's any move or attack white can perform
+        # we have some redundancy here which can be avoided but not worth the effort
+        found_white_move_or_attack = False
+        for piece in white_pieces:
+            if piece.possible_attacks or piece.possible_moves:
+                found_white_move_or_attack = True
+                break
+        if found_white_move_or_attack is False:
+            return True
+
+        return False
 
     def clean_cached_board(self):
         self._cached_board = None
@@ -60,8 +88,8 @@ class State:
         """
 
         # copy self.state and change it's copy
-        changed_state = State(self.turn, self.board.board_repr, self.level)
-        changed_board = changed_state.board
+        changed_state = State(self.turn, self._board.board_repr, self.level)
+        changed_board = changed_state._board
 
         if changed_board.is_there_piece_at(row_current, column_current):
             moved_piece = changed_board.get_piece_at(row_current, column_current)
@@ -83,8 +111,8 @@ class State:
         """
 
         # copy self.state and change it's copy
-        changed_state = State(self.turn, self.board.board_repr, self.level)
-        changed_board = changed_state.board
+        changed_state = State(self.turn, self._board.board_repr, self.level)
+        changed_board = changed_state._board
 
         if changed_board.is_there_piece_at(row_current, column_current):
             attacking_piece = changed_board.get_piece_at(row_current, column_current)
@@ -100,17 +128,17 @@ class State:
         Defines if any piece can attack
         :return: true/false
         """
-        for piece in self.board.get_pieces_of_color(self.turn):
+        for piece in self._board.get_pieces_of_color(self.turn):
             if piece.can_attack_anywhere():
                 return True
 
         return False
 
     def __str__(self):
-        printout = "Balance = " + f'{self.board.balance}' + \
-                "   Turn = " + f'{self.turn}' + \
-                "   Level = " + f'{self.level}' + "\n"
-        printout += self.board.__str__()
+        printout = "Balance = " + f'{self._board.balance}' + \
+                   "   Turn = " + f'{self.turn}' + \
+                   "   Level = " + f'{self.level}' + "\n"
+        printout += self._board.__str__()
 
         return printout
 
@@ -148,20 +176,18 @@ class State:
 
         # TODO take into consideration Kings logic (movements, attack, upgrades)
         if self._does_any_piece_can_attack():
-            for piece in self.board.get_attacking_pieces_of_color(self.turn):
+            for piece in self._board.get_attacking_pieces_of_color(self.turn):
 
                 set_of_new_sub_states = self._generate_next_states_during_attack(piece)
                 for new_sub_state in set_of_new_sub_states:
-
                     new_sub_state._next_level()
                     new_sub_state._next_turn()
                     set_of_new_states.append(new_sub_state)
 
         else:
-            for piece in self.board.get_moving_pieces_of_color(self.turn):
+            for piece in self._board.get_moving_pieces_of_color(self.turn):
 
                 for after_move_location in piece.possible_moves:
-
                     new_state_moved = self._get_state_after_movement(piece.row,
                                                                      piece.column,
                                                                      after_move_location[0],
@@ -189,7 +215,7 @@ class State:
             set_of_new_states.append(new_state)
 
             # if just appended state result in multiple-attack: append new states, delete prev.
-            attacking_piece = new_state.board.get_piece_at(after_attack_loc[0], after_attack_loc[1])
+            attacking_piece = new_state._board.get_piece_at(after_attack_loc[0], after_attack_loc[1])
             if attacking_piece.possible_attacks:
 
                 set_of_new_states.pop()
@@ -228,9 +254,9 @@ def test_simple_attack():
                0x28282828
                )
     state = State(Color.WHITE, board_r)
-    print(state.board)
+    print(state._board)
     print(state._get_state_after_attack(5, 2, 3, 0))
-    print(state.board)  # should be the first board itself (unchanged)
+    print(state._board)  # should be the first board itself (unchanged)
     state.clean_cached_board()
 
 
@@ -245,9 +271,9 @@ def test_generating_attacks():
                0x28282828
                )
     state = State(Color.WHITE, board_r)
-    print(state.board)
+    print(state._board)
 
-    for attack in state.board.get_piece_at(0, 1).possible_attacks:
+    for attack in state._board.get_piece_at(0, 1).possible_attacks:
         print(attack)
 
     state.print_next_states()
@@ -257,4 +283,3 @@ def test_generating_attacks():
 
 if __name__ == '__main__':
     test_generating_attacks()
-
