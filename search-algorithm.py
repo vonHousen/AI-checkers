@@ -40,7 +40,6 @@ class SearchAlgorithm:
         :param levels_count_to_analyse: count of levels taken into account
         :return: Tuple: ( h(state), state )
         """
-        # TODO make it saving final sequence of the moves
         if levels_count_to_analyse <= 0 or state.is_terminal():
             return state.board.balance, state
 
@@ -50,9 +49,10 @@ class SearchAlgorithm:
 
             # recursively use min_max(...) level down, append results to table
             for new_state in state.next_states:
-                states_to_choose_from.append(SearchAlgorithm.min_max(new_state, levels_count_to_analyse - 1))
+                min_max_tuple = SearchAlgorithm.min_max(new_state, levels_count_to_analyse - 1)
+                states_to_choose_from.append((min_max_tuple[0], min_max_tuple[1], new_state))
 
-            if state.turn == Color.WHITE:     # assuming white - player & black - opponent
+            if state.turn == Color.WHITE:     # assuming white = player & black = opponent
 
                 # choose the best (max) state from the generated ones
                 max_state_tuple = states_to_choose_from[0]
@@ -60,7 +60,7 @@ class SearchAlgorithm:
                     if appended_state[0] > max_state_tuple[0]:
                         max_state_tuple = appended_state
 
-                # state.next_move = max_state_tuple[1]
+                state.next_move = max_state_tuple[2]
                 return max_state_tuple
 
             else:   # state.turn == Color.BLACK
@@ -71,7 +71,7 @@ class SearchAlgorithm:
                     if appended_state[0] < min_state_tuple[0]:
                         min_state_tuple = appended_state
 
-                # state.next_move = min_state_tuple[1]
+                state.next_move = min_state_tuple[2]
                 return min_state_tuple
 
 
@@ -103,12 +103,18 @@ def test_min_max():
     state = State(Color.WHITE, board_r)
 
     alg = SearchAlgorithm(state)
+    print(20*"-")
     print("Root state:")
     print(state)
+    print(20*"-")
     print("Best (final) state:")
     print(alg.min_max(state, 3)[1])
+    print(20*"-")
     print("Root's next move (state):")
     print(state.next_move)
+    print(20*"-")
+    print("Final sequence:")
+    state.print_final_sequence()
 
 
 if __name__ == '__main__':

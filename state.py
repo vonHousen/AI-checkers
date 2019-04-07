@@ -132,6 +132,16 @@ class State:
         else:
             print("<There are no next states available>\n")
 
+    def print_final_sequence(self):
+        """
+        Prints recursively final sequence of moves resulting in best game outcome
+        :return: -
+        """
+        print(self)
+        if self.next_move:
+            self.next_move.print_final_sequence()
+
+
     def generate_next_states(self):
         """
         Generates all possible states generated from the current one (appends to self._next_states)
