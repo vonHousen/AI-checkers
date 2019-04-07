@@ -40,6 +40,7 @@ class SearchAlgorithm:
         :param levels_count_to_analyse: count of levels taken into account
         :return: Tuple: ( h(state), state )
         """
+        # TODO make it saving final sequence of the moves
         if levels_count_to_analyse <= 0 or state.is_terminal():
             return state.board.balance, state
 
@@ -104,8 +105,10 @@ def test_min_max():
     alg = SearchAlgorithm(state)
     print("Root state:")
     print(state)
-    print("Best state:")
+    print("Best (final) state:")
     print(alg.min_max(state, 3)[1])
+    print("Root's next move (state):")
+    print(state.next_move)
 
 
 if __name__ == '__main__':

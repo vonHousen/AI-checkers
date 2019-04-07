@@ -40,6 +40,7 @@ class State:
         Defines if state is terminal or not
         :return: true/false
         """
+        # TODO implement checking if one color is out of moves
         if not self.board.get_pieces_of_color(Color.WHITE) or not self.board.get_pieces_of_color(Color.BLACK):
             return True
         else:
@@ -138,6 +139,7 @@ class State:
         """
         set_of_new_states = []
 
+        # TODO take into consideration Kings logic (movements, attack, upgrades)
         if self._does_any_piece_can_attack():
             for piece in self.board.get_attacking_pieces_of_color(self.turn):
 
