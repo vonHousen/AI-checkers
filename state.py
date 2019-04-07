@@ -27,7 +27,7 @@ class State:
         self._value = None
 
     @property
-    def value(self):
+    def balance(self):
         if self._value is None:
             self._value = self._board.balance
         return self._value
