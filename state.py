@@ -174,7 +174,15 @@ class State:
             for piece in self._board.get_attacking_pieces_of_color(self.turn):
 
                 set_of_new_sub_states = self._generate_next_states_during_attack(piece)
-                for new_sub_state in set_of_new_sub_states:
+                for new_sub_state, after_attack_row, after_attack_col in set_of_new_sub_states:
+
+                    # if attacking piece after finished attack is a man and can become a king - do so
+                    moved_piece = new_sub_state._board.get_piece_at(after_attack_row, after_attack_col)
+                    # if isinstance(piece, WhiteMan) or isinstance(piece, BlackMan)
+                    if moved_piece.get_representation() == 0x0000000a or moved_piece.get_representation() == 0x00000002:
+                        if moved_piece.can_be_replaced_with_king():
+                            moved_piece.replace_with_king()
+
                     new_sub_state._next_level()
                     new_sub_state._next_turn()
                     set_of_new_states.append(new_sub_state)
@@ -182,11 +190,19 @@ class State:
         else:
             for piece in self._board.get_moving_pieces_of_color(self.turn):
 
-                for after_move_location in piece.possible_moves:
+                for after_move_row, after_move_col in piece.possible_moves:
                     new_state_moved = self._get_state_after_movement(piece.row,
                                                                      piece.column,
-                                                                     after_move_location[0],
-                                                                     after_move_location[1])
+                                                                     after_move_row,
+                                                                     after_move_col)
+
+                    # if moved_piece is a man and can become a king - do so
+                    moved_piece = new_state_moved._board.get_piece_at(after_move_row, after_move_col)
+                    # if isinstance(piece, WhiteMan) or isinstance(piece, BlackMan)
+                    if moved_piece.get_representation() == 0x0000000a or moved_piece.get_representation() == 0x00000002:
+                        if moved_piece.can_be_replaced_with_king():
+                            moved_piece.replace_with_king()
+
                     new_state_moved._next_level()
                     new_state_moved._next_turn()
                     self.next_states.append(new_state_moved)
@@ -202,20 +218,20 @@ class State:
         """
         set_of_new_states = []
 
-        for after_attack_loc in piece.possible_attacks:
+        for after_attack_row, after_attack_col in piece.possible_attacks:
 
             new_state = \
-                self._get_state_after_attack(piece.row, piece.column, after_attack_loc[0], after_attack_loc[1])
-            set_of_new_states.append(new_state)
+                self._get_state_after_attack(piece.row, piece.column, after_attack_row, after_attack_col)
+            set_of_new_states.append(tuple((new_state, after_attack_row, after_attack_col)))
 
             # if just appended state result in multiple-attack: append new states, delete prev.
-            attacking_piece = new_state._board.get_piece_at(after_attack_loc[0], after_attack_loc[1])
+            attacking_piece = new_state._board.get_piece_at(after_attack_row, after_attack_col)
             if attacking_piece.possible_attacks:
 
                 set_of_new_states.pop()
                 set_of_new_sub_states = new_state._generate_next_states_during_attack(attacking_piece)
-                for new_sub_state in set_of_new_sub_states:
-                    set_of_new_states.append(new_sub_state)
+                for new_sub_state, after_sub_attack_row, after_sub_attack_col in set_of_new_sub_states:
+                    set_of_new_states.append(tuple((new_sub_state, after_sub_attack_row, after_sub_attack_col)))
 
         return set_of_new_states
 

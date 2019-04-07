@@ -202,9 +202,9 @@ class Man(Piece, ABC):
         row = self.row
         column = self.column
         board.delete_piece_at(row, column)
-        if isinstance(self, WhiteMan):
+        if self.get_representation() == 0x00000002:      # isinstance(piece, WhiteMan):
             king = WhiteKing(row, column, board)
-        elif isinstance(self, BlackMan):
+        elif self.get_representation() == 0x0000000a:    # isinstance(piece, BlackMan):
             king = BlackKing(row, column, board)
         else:
             raise RuntimeError("What: Replacing not Man object with King?")
