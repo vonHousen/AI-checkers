@@ -139,7 +139,6 @@ class State:
         if self.next_move:
             self.next_move.print_final_sequence()
 
-
     def generate_next_states(self):
         """
         Generates all possible states generated from the current one (appends to self._next_states)
@@ -167,6 +166,7 @@ class State:
                                                                      piece.column,
                                                                      after_move_location[0],
                                                                      after_move_location[1])
+                    # TODO check if man=piece can become a king here
                     new_state_moved._next_level()
                     new_state_moved._next_turn()
                     self.next_states.append(new_state_moved)
