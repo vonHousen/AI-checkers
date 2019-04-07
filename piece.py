@@ -66,196 +66,13 @@ class Piece(ABC):
         return [(row, col) for row, col in potential if self._can_attack_to(row, col)]
 
     def move_to(self, row_desired, column_desired):
-
         if not self._can_move_to(row_desired, column_desired):
-            raise RuntimeError("Movement not allowed")
-
-        else:
-            self.board.delete_piece_at(self.row, self.column)
-            self.board.set_piece_at(row_desired, column_desired, self)
-
-            self.row = row_desired
-            self.column = column_desired
-
-    @abstractmethod
-    def attack_to(self, row_desired, column_desired):
-        pass
-
-    def _move_unsafely_to(self, row_desired, column_desired):
-
-        if not is_allowed_cell_on_board(row_desired, column_desired) \
-                or self.board.is_there_piece_at(row_desired, column_desired):
-            raise RuntimeError("Movement during an attack not allowed")
-
-        else:
-            self.board.delete_piece_at(self.row, self.column)
-            self.board.set_piece_at(row_desired, column_desired, self)
-
-            self.row = row_desired
-            self.column = column_desired
-
-    def _is_different_color_than(self, piece):
-        if self.color != piece.color:
-            return True
-        return False
-
-    @abstractmethod
-    def _can_move_to(self, row_desired, column_desired):
-        """
-        Checks if man can move to desired place, it checks if its allowed move and if the place is on the board
-        :param row_desired: destination to move
-        :param column_desired: destination to move
-        :return: true/false
-        """
-        pass
-
-    @abstractmethod
-    def _can_attack_to(self, row_desired, column_desired):
-        """
-        :param row_desired: location after an attack
-        :param column_desired: location after an attack
-        :return: true/false
-        """
-        pass
-
-    @abstractmethod
-    def _potential_moves(self):
-        pass
-
-    @abstractmethod
-    def _potential_attacks(self):
-        pass
-
-
-class Man(Piece, ABC):
-    def __init__(self, row, column, board):
-        super().__init__(row, column, board)
+            raise ValueError("Movement not allowed")
+        self._move_unsafely_to(row_desired, column_desired)
 
     def attack_to(self, row_desired, column_desired):
-
-        row_attacked = (row_desired + self.row) // 2
-        column_attacked = (column_desired + self.column) // 2
-
         if not self._can_attack_to(row_desired, column_desired):
-            raise RuntimeError("Attack not allowed")
-
-        else:
-            self._move_unsafely_to(row_desired, column_desired)
-            self.board.delete_piece_at(row_attacked, column_attacked)
-
-    @abstractmethod
-    def can_be_replaced_with_king(self):
-        pass
-
-    def replace_with_king(self):
-        board = self.board
-        row = self.row
-        column = self.column
-        board.delete_piece_at(row, column)
-        if isinstance(self, WhiteMan):
-            king = WhiteKing(row, column, board)
-        elif isinstance(self, BlackMan):
-            king = BlackKing(row, column, board)
-        else:
-            raise RuntimeError("impossible")
-        board.set_piece_at(row, column, king)
-        pass
-
-    def _can_move_to(self, row_desired, column_desired):
-
-        if abs(row_desired - self.row) != 1 or abs(column_desired - self.column) != 1:
-            raise ValueError("Piece can be moved only diagonally by 1 cell")
-
-        if (row_desired, column_desired) not in self._potential_moves():
-            raise ValueError("This piece can't be moved in this direction")
-
-        if not is_allowed_cell_on_board(row_desired, column_desired):
-            return False
-
-        if self.board.is_there_piece_at(row_desired, column_desired):
-            return False
-        return True
-
-    def _can_attack_to(self, row_desired, column_desired):
-        if (row_desired, column_desired) not in self._potential_attacks():
-            raise ValueError("This piece can't be attack in this direction")
-
-        if not is_allowed_cell_on_board(row_desired, column_desired):
-            return False
-
-        if self.board.is_there_piece_at(row_desired, column_desired):
-            return False
-
-        row_attacked = (row_desired + self.row) // 2
-        column_attacked = (column_desired + self.column) // 2
-
-        piece_we_attack = self.board.get_piece_at(row_attacked, column_attacked)
-
-        if not piece_we_attack:
-            return False
-
-        if not self._is_different_color_than(piece_we_attack):
-            return False
-
-        return True
-
-    @abstractmethod
-    def _potential_moves(self):
-        """Can't implement it here, because white can only move up, and black can only move down"""
-        pass
-
-    def _potential_attacks(self):
-        return [(self.row - 2, self.column - 2), (self.row - 2, self.column + 2),
-                (self.row + 2, self.column - 2), (self.row + 2, self.column + 2)]
-
-
-class BlackMan(Man):
-    def __init__(self, row, column, board):
-        super().__init__(row, column, board)
-
-    @property
-    def color(self):
-        return Color.BLACK
-
-    def can_be_replaced_with_king(self):
-        if self.row is 7:
-            return True
-        return False
-
-    def __str__(self):
-        return "b"
-
-    def _potential_moves(self):
-        """Black are moving toward ascending row numbers"""
-        return [(self.row + 1, self.column - 1), (self.row + 1, self.column + 1)]
-
-
-class WhiteMan(Man):
-    def __init__(self, row, column, board):
-        super().__init__(row, column, board)
-
-    @property
-    def color(self):
-        return Color.WHITE
-
-    def can_be_replaced_with_king(self):
-        if self.row is 0:
-            return True
-        return False
-
-    def __str__(self):
-        return "w"
-
-    def _potential_moves(self):
-        """Black are moving toward ascending row numbers"""
-        return [(self.row - 1, self.column - 1), (self.row - 1, self.column + 1)]
-
-
-class King(Piece, ABC):
-    def __init__(self, row, column, board):
-        super().__init__(row, column, board)
-
-    def attack_to(self, row_desired, column_desired):
+            raise ValueError("Attack not allowed")
 
         between_cells = self._get_cells_on_the_way_to(row_desired, column_desired)
 
@@ -265,16 +82,77 @@ class King(Piece, ABC):
                 piece = self.board.get_piece_at(row, column)
 
         if piece is None:
-            raise RuntimeError("Attack not allowed")
+            raise RuntimeError("Redundancy check: this should never happen")  # it was already checked by _can_attack_to
         row_attacked = piece.row
         column_attacked = piece.column
 
-        if not self._can_attack_to(row_desired, column_desired):
-            raise RuntimeError("Attack not allowed")
+        self._move_unsafely_to(row_desired, column_desired)
+        self.board.delete_piece_at(row_attacked, column_attacked)
 
-        else:
-            self._move_unsafely_to(row_desired, column_desired)
-            self.board.delete_piece_at(row_attacked, column_attacked)
+    def _move_unsafely_to(self, row_desired, column_desired):
+
+        self.board.delete_piece_at(self.row, self.column)
+        self.board.set_piece_at(row_desired, column_desired, self)
+
+        self.row = row_desired
+        self.column = column_desired
+
+    def _is_different_color_than(self, piece):
+        if self.color != piece.color:
+            return True
+        return False
+
+    def _can_move_to(self, row_desired, column_desired):
+        """
+                Checks if man can move to desired place, it checks if its allowed move and if the place is on the board
+                :param row_desired: destination to move
+                :param column_desired: destination to move
+                :return: true/false
+                """
+        if (row_desired, column_desired) not in self._potential_moves():
+            raise ValueError("This piece can't be moved in this direction")
+
+        if not is_allowed_cell_on_board(row_desired, column_desired):
+            return False
+
+        if self.board.is_there_piece_at(row_desired, column_desired):
+            return False
+
+        between_cells = self._get_cells_on_the_way_to(row_desired, column_desired)
+
+        for row, column in between_cells:
+            if self.board.is_there_piece_at(row, column):
+                return False
+        return True
+
+    def _can_attack_to(self, row_desired, column_desired):
+        """
+        :param row_desired: location after an attack
+        :param column_desired: location after an attack
+        :return: true/false
+        """
+        if (row_desired, column_desired) not in self._potential_attacks():
+            raise ValueError("This piece can't be attack in this direction")
+
+        if not is_allowed_cell_on_board(row_desired, column_desired):
+            return False
+
+        if self.board.is_there_piece_at(row_desired, column_desired):
+            return False
+
+        between_cells = self._get_cells_on_the_way_to(row_desired, column_desired)
+
+        piece = None
+        for row, column in between_cells:
+            if self.board.is_there_piece_at(row, column):
+                if piece is not None:  # more than one piece between
+                    return False
+                piece = self.board.get_piece_at(row, column)
+                if not self._is_different_color_than(piece):  # if is the same color
+                    return False
+        if piece is None:  # there isn't any piece to attack
+            return False
+        return True
 
     def _get_cells_on_the_way_to(self, row_desired, column_desired):
         if self.row < row_desired:
@@ -298,48 +176,92 @@ class King(Piece, ABC):
 
         return result
 
-    def _can_move_to(self, row_desired, column_desired):
-        if (row_desired, column_desired) not in self._potential_moves():
-            raise ValueError("This piece can't be moved in this direction")
+    @abstractmethod
+    def _potential_moves(self):
+        pass
 
-        if not is_allowed_cell_on_board(row_desired, column_desired):
-            return False
+    @abstractmethod
+    def _potential_attacks(self):
+        pass
 
-        if self.board.is_there_piece_at(row_desired, column_desired):
-            return False
 
-        between_cells = self._get_cells_on_the_way_to(row_desired, column_desired)
+class Man(Piece, ABC):
+    def __init__(self, row, column, board):
+        super().__init__(row, column, board)
 
-        for row, column in between_cells:
-            if self.board.is_there_piece_at(row, column):
-                return False
+    @abstractmethod
+    def can_be_replaced_with_king(self):
+        pass
 
-        return True
+    def replace_with_king(self):
+        board = self.board
+        row = self.row
+        column = self.column
+        board.delete_piece_at(row, column)
+        if isinstance(self, WhiteMan):
+            king = WhiteKing(row, column, board)
+        elif isinstance(self, BlackMan):
+            king = BlackKing(row, column, board)
+        else:
+            raise RuntimeError("What: Replacing not Man object with King?")
+        board.set_piece_at(row, column, king)
+        pass
 
-    def _can_attack_to(self, row_desired, column_desired):
-        if (row_desired, column_desired) not in self._potential_attacks():
-            raise ValueError("This piece can't be attack in this direction")
+    @abstractmethod
+    def _potential_moves(self):
+        """Can't implement it here, because white can only move up, and black can only move down"""
+        pass
 
-        if not is_allowed_cell_on_board(row_desired, column_desired):
-            return False
+    def _potential_attacks(self):
+        return [(self.row - 2, self.column - 2), (self.row - 2, self.column + 2),
+                (self.row + 2, self.column - 2), (self.row + 2, self.column + 2)]
 
-        if self.board.is_there_piece_at(row_desired, column_desired):
-            return False
 
-        between_cells = self._get_cells_on_the_way_to(row_desired, column_desired)
+class BlackMan(Man):
+    def __init__(self, row, column, board):
+        super().__init__(row, column, board)
 
-        piece = None
-        for row, column in between_cells:
-            if self.board.is_there_piece_at(row, column):
-                if piece is not None:  # more than one piece between
-                    return False
-                piece = self.board.get_piece_at(row, column)
-                if not self._is_different_color_than(piece):  # if is the same color
-                    return False
-        if piece is None:  # there isn't any piece to attack
-            return False
+    def __str__(self):
+        return "b"
 
-        return True
+    @property
+    def color(self):
+        return Color.BLACK
+
+    def can_be_replaced_with_king(self):
+        if self.row is 7:
+            return True
+        return False
+
+    def _potential_moves(self):
+        """Black are moving toward ascending row numbers"""
+        return [(self.row + 1, self.column - 1), (self.row + 1, self.column + 1)]
+
+
+class WhiteMan(Man):
+    def __init__(self, row, column, board):
+        super().__init__(row, column, board)
+
+    def __str__(self):
+        return "w"
+
+    @property
+    def color(self):
+        return Color.WHITE
+
+    def can_be_replaced_with_king(self):
+        if self.row is 0:
+            return True
+        return False
+
+    def _potential_moves(self):
+        """Black are moving toward ascending row numbers"""
+        return [(self.row - 1, self.column - 1), (self.row - 1, self.column + 1)]
+
+
+class King(Piece, ABC):
+    def __init__(self, row, column, board):
+        super().__init__(row, column, board)
 
     def _potential_attacks(self):
         result = []
