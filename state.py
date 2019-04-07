@@ -47,7 +47,6 @@ class State:
         Defines if state is terminal or not
         :return: true/false
         """
-        # TODO implement checking if one color is out of moves
         white_pieces = self._board.get_pieces_of_color(Color.WHITE)
         black_pieces = self._board.get_pieces_of_color(Color.BLACK)
         if not white_pieces or not black_pieces:  # if any of them dont have pieces left
@@ -192,7 +191,14 @@ class State:
                                                                      piece.column,
                                                                      after_move_location[0],
                                                                      after_move_location[1])
-                    # TODO check if man=piece can become a king here
+
+                    # if moved_piece is a man and can become a king - do so
+                    moved_piece = new_state_moved._board.get_piece_at(after_move_location[0], after_move_location[1])
+                    # if isinstance(piece, WhiteMan) or isinstance(piece, BlackMan)
+                    if moved_piece.get_representation() == 0x0000000a or moved_piece.get_representation() == 0x00000002:
+                        if moved_piece.can_be_replaced_with_king():
+                            moved_piece.replace_with_king()
+
                     new_state_moved._next_level()
                     new_state_moved._next_turn()
                     self.next_states.append(new_state_moved)

@@ -14,7 +14,7 @@ class SearchAlgorithm:
         :return: Tuple: ( h(state), state )
         """
         if levels_count_to_analyse <= 0 or state.is_terminal():
-            return state._board.balance, state
+            return state._board.balance, state, None
 
         else:
             state.generate_next_states()

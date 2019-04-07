@@ -92,13 +92,13 @@ class Board:
         """
         result = 0
         for piece in self.pieces:
-            if isinstance(piece, BlackMan):
+            if piece.get_representation() == 0x0000000a:        # isinstance(piece, BlackMan):
                 result -= 1
-            elif isinstance(piece, BlackKing):
+            elif piece.get_representation() == 0x0000000b:      # isinstance(piece, BlackKing):
                 result -= 1.6
-            elif isinstance(piece, WhiteMan):
+            elif piece.get_representation() == 0x00000002:      # isinstance(piece, WhiteMan):
                 result += 1
-            elif isinstance(piece, WhiteKing):
+            elif piece.get_representation() == 0x00000003:      # isinstance(piece, WhiteKing):
                 result += 1.6
         return result
 
