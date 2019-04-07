@@ -27,7 +27,13 @@ class State:
         self._value = None
 
     @property
-    def value(self):
+    def balance(self):
+        if self.is_terminal():
+            if self.turn is Color.WHITE:  # black wins
+                return -1000
+            else:  # white wins
+                return 1000
+
         if self._value is None:
             self._value = self._board.balance
         return self._value
@@ -47,28 +53,19 @@ class State:
         Defines if state is terminal or not
         :return: true/false
         """
-        white_pieces = self._board.get_pieces_of_color(Color.WHITE)
-        black_pieces = self._board.get_pieces_of_color(Color.BLACK)
-        if not white_pieces or not black_pieces:  # if any of them dont have pieces left
+        # get pieces of player that is moving in this turn
+        pieces = self._board.get_pieces_of_color(self.turn)
+
+        if not pieces:  # if you have no pieces left its game over
             return True
 
-        # check if there's any move or attack black can perform
-        found_black_move_or_attack = False
-        for piece in black_pieces:
+        # check if there's any move or attack current player can perform
+        found_move_or_attack = False
+        for piece in pieces:
             if piece.possible_attacks or piece.possible_moves:
-                found_black_move_or_attack = True
+                found_move_or_attack = True
                 break
-        if found_black_move_or_attack is False:
-            return True
-
-        # check if there's any move or attack white can perform
-        # we have some redundancy here which can be avoided but not worth the effort
-        found_white_move_or_attack = False
-        for piece in white_pieces:
-            if piece.possible_attacks or piece.possible_moves:
-                found_white_move_or_attack = True
-                break
-        if found_white_move_or_attack is False:
+        if found_move_or_attack is False:
             return True
 
         return False
