@@ -15,7 +15,7 @@ class ProfileReader:
         stats = pstats.Stats("profiling_results")
         stats.sort_stats("cumtime")  # całkowity czas spedzony w funkcji i jej wywołaniach
         # stats.sort_stats("tottime")  # czas spędzony tylko w tej funkcji
-        stats.print_stats(20)
+        stats.print_stats(30)
 
 
 if __name__ == '__main__':

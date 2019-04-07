@@ -2,11 +2,8 @@ from state import *
 import time
 import cProfile
 
-class SearchAlgorithm:
 
-    def __init__(self, state):
-        self._root_state = state
-        self._terminal_state = None
+class SearchAlgorithm:
 
     @staticmethod
     def min_max(state, levels_count_to_analyse):
@@ -17,24 +14,24 @@ class SearchAlgorithm:
         :return: Tuple: ( h(state), state )
         """
         if levels_count_to_analyse <= 0 or state.is_terminal():
-            return state.board.balance, state
+            return state._board.balance, state
 
         else:
             state.generate_next_states()
-            child_states = []
+            child_states_tuples = []
 
             # recursively use min_max(...) level down, append results to table
-            for new_state in state.next_states:
-                min_max_tuple = SearchAlgorithm.min_max(new_state, levels_count_to_analyse - 1)
-                child_states.append((min_max_tuple[0], min_max_tuple[1], new_state))
+            for child_state in state.next_states:
+                min_max_tuple = SearchAlgorithm.min_max(child_state, levels_count_to_analyse - 1)
+                child_states_tuples.append((min_max_tuple[0], min_max_tuple[1], child_state))
 
             if state.turn == Color.WHITE:  # assuming white = player & black = opponent
 
                 # choose the best (max) state from the generated ones
-                max_state_tuple = child_states[0]
-                for appended_state in child_states:
-                    if appended_state[0] > max_state_tuple[0]:
-                        max_state_tuple = appended_state
+                max_state_tuple = child_states_tuples[0]
+                for child_state_tuple in child_states_tuples:
+                    if child_state_tuple[0] > max_state_tuple[0]:
+                        max_state_tuple = child_state_tuple
 
                 state.next_move = max_state_tuple[2]
                 return max_state_tuple
@@ -42,10 +39,10 @@ class SearchAlgorithm:
             else:  # state.turn == Color.BLACK
 
                 # choose the best (min) state from the generated ones
-                min_state_tuple = child_states[0]
-                for appended_state in child_states:
-                    if appended_state[0] < min_state_tuple[0]:
-                        min_state_tuple = appended_state
+                min_state_tuple = child_states_tuples[0]
+                for child_state_tuple in child_states_tuples:
+                    if child_state_tuple[0] < min_state_tuple[0]:
+                        min_state_tuple = child_state_tuple
 
                 state.next_move = min_state_tuple[2]
                 return min_state_tuple
@@ -61,7 +58,7 @@ def test_min_max():
                0x82828282,
                0x28282828)
     state = State(Color.WHITE)
-    alg = SearchAlgorithm(state)
+    alg = SearchAlgorithm()
     print(40 * "-")
     print("Root state:")
     print(state)
