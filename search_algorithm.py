@@ -147,7 +147,7 @@ def test_kings():
     print(40 * "-")
     start_time = time.time()
 
-    result = SearchAlgorithm.min_max(state, 4)
+    result = SearchAlgorithm.min_max(state, 3)
 
     end_time = time.time()
     print(40 * "-")
