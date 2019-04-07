@@ -12,7 +12,7 @@ class State:
                                                           0x28282828,
                                                           0x82828282,
                                                           0x28282828
-                                                          )):
+                                                          ), level=0):
         self.turn = next_turn
         # 8 not allowed or empty
         # 2 white man
@@ -20,6 +20,7 @@ class State:
         # a black man
         # b black king
         self.board_repr = board_repr
+        self.level = level
         self._cached_board = None
         self._next_states = []
 
@@ -57,7 +58,6 @@ class State:
         else:
             raise RuntimeError("Moving piece do not exist")
 
-        changed_state._next_turn()
 
         return changed_state
 
@@ -82,7 +82,6 @@ class State:
         else:
             raise RuntimeError("Attacking piece do not exist")
 
-        changed_state._next_turn()
 
         return changed_state
 
@@ -101,7 +100,9 @@ class State:
     def print_next_states(self):
         if self._next_states:
             for next_state in self._next_states:
-                print("Balance = " + f'{next_state.board.balance}' + "   Turn = " + f'{next_state.turn}')
+                print("Balance = " + f'{next_state.board.balance}' +
+                "   Turn = " + f'{next_state.turn}' +
+                "   Level = " + f'{next_state.level}')
                 print(next_state)
         else:
             print("<There are no next states available>\n")
@@ -118,12 +119,16 @@ class State:
 
                 set_of_new_sub_states = self._generate_next_states_during_attack(piece)
                 for new_sub_state in set_of_new_sub_states:
+                    new_sub_state._next_level()
+                    new_sub_state._next_turn()
                     set_of_new_states.append(new_sub_state)
 
             else:
                 for after_move_loc in piece.possible_moves:
-                    self._next_states.append(
-                        self._get_state_after_movement(piece.row, piece.column, after_move_loc[0], after_move_loc[1]))
+                    new_state_moved = self._get_state_after_movement(piece.row, piece.column, after_move_loc[0], after_move_loc[1])
+                    new_state_moved._next_level()
+                    new_state_moved._next_turn()
+                    self._next_states.append(new_state_moved)
 
         for new_state in set_of_new_states:
             self._next_states.append(new_state)
@@ -163,6 +168,12 @@ class State:
         else:
             self.turn = Color.BLACK
 
+    def _next_level(self):
+        """
+        Changes deepness level in tree structure
+        :return:
+        """
+        self.level += 1
 
 def test_simple_attack():
     board_r = (0x8a8a8a8a,

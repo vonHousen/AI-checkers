@@ -56,10 +56,10 @@ def test_generating_attacks():
 
 def test_generating_levels():
     board_r = (0x8a8a8a8a,
-               0xa888a8a8,
+               0xa8a8a8a8,
                0x8a8a8a8a,
                0x88888888,
-               0x8a888888,
+               0x88888888,
                0x28282828,
                0x82828282,
                0x28282828)
