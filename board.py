@@ -72,6 +72,25 @@ class Board:
         """
         return [piece for row in self.__board for piece in row if (piece is not None and piece.color == color)]
 
+    def get_attacking_pieces_of_color(self, color):
+        """
+        :return: List of pieces on the board of specific color, only if they can attack
+        """
+        return [piece for row in self.__board for piece in row if
+                (piece is not None
+                 and piece.color == color
+                 and piece.can_attack_anywhere())]
+
+    def get_moving_pieces_of_color(self, color):
+        """
+        :return: List of pieces on the board of specific color, only if they can move and not attack
+        """
+        return [piece for row in self.__board for piece in row if
+                (piece is not None
+                 and piece.color == color
+                 and not piece.can_attack_anywhere()
+                 and piece.can_move_anywhere())]
+
     @property
     def balance(self):
         """

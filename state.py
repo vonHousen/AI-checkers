@@ -96,6 +96,17 @@ class State:
 
         return changed_state
 
+    def _does_any_piece_can_attack(self):
+        """
+        Defines if any piece can attack
+        :return: true/false
+        """
+        for piece in self.board.get_pieces_of_color(self.turn):
+            if piece.can_attack_anywhere():
+                return True
+
+        return False
+
     def __str__(self):
         printout = "Balance = " + f'{self.board.balance}' + \
                 "   Turn = " + f'{self.turn}' + \
@@ -127,18 +138,25 @@ class State:
         """
         set_of_new_states = []
 
-        for piece in self.board.get_pieces_of_color(self.turn):
-            if piece.possible_attacks:
+        if self._does_any_piece_can_attack():
+            for piece in self.board.get_attacking_pieces_of_color(self.turn):
 
                 set_of_new_sub_states = self._generate_next_states_during_attack(piece)
                 for new_sub_state in set_of_new_sub_states:
+
                     new_sub_state._next_level()
                     new_sub_state._next_turn()
                     set_of_new_states.append(new_sub_state)
 
-            else:
-                for after_move_loc in piece.possible_moves:
-                    new_state_moved = self._get_state_after_movement(piece.row, piece.column, after_move_loc[0], after_move_loc[1])
+        else:
+            for piece in self.board.get_moving_pieces_of_color(self.turn):
+
+                for after_move_location in piece.possible_moves:
+
+                    new_state_moved = self._get_state_after_movement(piece.row,
+                                                                     piece.column,
+                                                                     after_move_location[0],
+                                                                     after_move_location[1])
                     new_state_moved._next_level()
                     new_state_moved._next_turn()
                     self.next_states.append(new_state_moved)
@@ -187,6 +205,7 @@ class State:
         :return:
         """
         self.level += 1
+
 
 def test_simple_attack():
     board_r = (0x8a8a8a8a,

@@ -30,7 +30,6 @@ class SearchAlgorithm:
             for new_state in state_to_generate_from.next_states:
                 SearchAlgorithm._generate_new_from(new_state, levels_count_to_generate - 1)
 
-        # TODO fix it to generate new states in correct order
         # if state_to_generate_from.level == 1: state_to_generate_from.print_next_states()
 
     @staticmethod
@@ -106,7 +105,7 @@ def test_min_max():
     print("Root state:")
     print(state)
     print("Best state:")
-    print(alg.min_max(state, 2)[1])
+    print(alg.min_max(state, 3)[1])
 
 
 if __name__ == '__main__':
