@@ -1,5 +1,6 @@
 from state import *
 import time
+import cProfile
 
 
 class SearchAlgorithm:
@@ -8,6 +9,7 @@ class SearchAlgorithm:
         self._root_state = state
         self._terminal_state = None
 
+    # TODO delete me, I am useless
     def generate_new(self, levels_count_to_generate):
         """
         Generates multiple levels of new states
@@ -16,7 +18,7 @@ class SearchAlgorithm:
         """
         SearchAlgorithm._generate_new_from(self._root_state, levels_count_to_generate)
 
-    @staticmethod
+    @staticmethod # TODO delete me, I am useless
     def _generate_new_from(state_to_generate_from, levels_count_to_generate):
         """
         Recursively generates tree structure from new states
@@ -111,7 +113,7 @@ def test_min_max():
     print("Best (final) state:")
     start_min_max = time.time()
 
-    final_state = alg.min_max(state, 2)[1]
+    final_state = alg.min_max(state, 6)[1]
 
     end_min_max = time.time()
     print(final_state)
@@ -124,4 +126,5 @@ def test_min_max():
 
 
 if __name__ == '__main__':
+    # cProfile.run('test_min_max()')
     test_min_max()

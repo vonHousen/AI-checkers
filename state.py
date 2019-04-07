@@ -60,7 +60,7 @@ class State:
         """
 
         # copy self.state and change it's copy
-        changed_state = copy.deepcopy(self)
+        changed_state = State(self.turn, self.board.board_repr, self.level)
         changed_board = changed_state.board
 
         if changed_board.is_there_piece_at(row_current, column_current):
@@ -69,7 +69,6 @@ class State:
 
         else:
             raise RuntimeError("Moving piece do not exist")
-
 
         return changed_state
 
@@ -84,7 +83,7 @@ class State:
         """
 
         # copy self.state and change it's copy
-        changed_state = copy.deepcopy(self)
+        changed_state = State(self.turn, self.board.board_repr, self.level)
         changed_board = changed_state.board
 
         if changed_board.is_there_piece_at(row_current, column_current):
@@ -93,7 +92,6 @@ class State:
 
         else:
             raise RuntimeError("Attacking piece do not exist")
-
 
         return changed_state
 
