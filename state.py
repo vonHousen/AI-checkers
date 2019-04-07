@@ -23,6 +23,7 @@ class State:
         self.level = level
         self._cached_board = None
         self.next_states = []
+        self.next_move = None
 
     @property
     def board(self):
@@ -33,6 +34,16 @@ class State:
         if self._cached_board is None:
             self._cached_board = Board(self.board_repr)
         return self._cached_board
+
+    def is_terminal(self):
+        """
+        Defines if state is terminal or not
+        :return: true/false
+        """
+        if not self.board.get_pieces_of_color(Color.WHITE) or not self.board.get_pieces_of_color(Color.BLACK):
+            return True
+        else:
+            return False
 
     def clean_cached_board(self):
         self._cached_board = None

@@ -35,7 +35,13 @@ class SearchAlgorithm:
 
     @staticmethod
     def min_max(state, levels_count_to_analyse):
-        if levels_count_to_analyse <= 0:
+        """
+        Pure min_max algorithm for choosing the best move
+        :param state: current state
+        :param levels_count_to_analyse: count of levels taken into account
+        :return: Tuple: ( h(state), state )
+        """
+        if levels_count_to_analyse <= 0 or state.is_terminal():
             return state.board.balance, state
 
         else:
@@ -54,6 +60,7 @@ class SearchAlgorithm:
                     if appended_state[0] > max_state_tuple[0]:
                         max_state_tuple = appended_state
 
+                # state.next_move = max_state_tuple[1]
                 return max_state_tuple
 
             else:   # state.turn == Color.BLACK
@@ -64,6 +71,7 @@ class SearchAlgorithm:
                     if appended_state[0] < min_state_tuple[0]:
                         min_state_tuple = appended_state
 
+                # state.next_move = min_state_tuple[1]
                 return min_state_tuple
 
 
@@ -85,8 +93,8 @@ def test_generating_levels():
 
 def test_min_max():
     board_r = (0x8a8a8a8a,
-               0xa8a8a8a8,
-               0x888a8a8a,
+               0xa888a8a8,
+               0x8a8a8a8a,
                0x88888888,
                0x8a888888,
                0x28282828,
@@ -95,8 +103,10 @@ def test_min_max():
     state = State(Color.WHITE, board_r)
 
     alg = SearchAlgorithm(state)
+    print("Root state:")
     print(state)
-    print(alg.min_max(state,1)[1])
+    print("Best state:")
+    print(alg.min_max(state, 2)[1])
 
 
 if __name__ == '__main__':
