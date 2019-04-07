@@ -1,7 +1,7 @@
 from state import *
 
 
-class MinMax:
+class SearchAlgorithm:
 
     def __init__(self, state):
         self._root_state = state
@@ -13,7 +13,7 @@ class MinMax:
         :param levels_count_to_generate: number of levels algorithm will generate new states
         :return: -
         """
-        MinMax._generate_new_from(self._root_state, levels_count_to_generate)
+        SearchAlgorithm._generate_new_from(self._root_state, levels_count_to_generate)
 
     @staticmethod
     def _generate_new_from(state_to_generate_from, levels_count_to_generate):
@@ -27,48 +27,77 @@ class MinMax:
             return
         else:
             state_to_generate_from.generate_next_states()
-            for new_state in state_to_generate_from._next_states:
-                MinMax._generate_new_from(new_state, levels_count_to_generate - 1)
+            for new_state in state_to_generate_from.next_states:
+                SearchAlgorithm._generate_new_from(new_state, levels_count_to_generate - 1)
 
         # TODO fix it to generate new states in correct order
-        state_to_generate_from.print_next_states()
+        # if state_to_generate_from.level == 1: state_to_generate_from.print_next_states()
+
+    @staticmethod
+    def min_max(state, levels_count_to_analyse):
+        if levels_count_to_analyse <= 0:
+            return state.board.balance, state
+
+        else:
+            state.generate_next_states()
+            states_to_choose_from = []
+
+            # recursively use min_max(...) level down, append results to table
+            for new_state in state.next_states:
+                states_to_choose_from.append(SearchAlgorithm.min_max(new_state, levels_count_to_analyse - 1))
+
+            if state.turn == Color.WHITE:     # assuming white - player & black - opponent
+
+                # choose the best (max) state from the generated ones
+                max_state_tuple = states_to_choose_from[0]
+                for appended_state in states_to_choose_from:
+                    if appended_state[0] > max_state_tuple[0]:
+                        max_state_tuple = appended_state
+
+                return max_state_tuple
+
+            else:   # state.turn == Color.BLACK
+
+                # choose the best (min) state from the generated ones
+                min_state_tuple = states_to_choose_from[0]
+                for appended_state in states_to_choose_from:
+                    if appended_state[0] < min_state_tuple[0]:
+                        min_state_tuple = appended_state
+
+                return min_state_tuple
 
 
-def test_generating_attacks():
+def test_generating_levels():
     board_r = (0x8a8a8a8a,
-               0xa888a8a8,
-               0x8a8a8a8a,
+               0xa8a8a8a8,
+               0x888a8a8a,
                0x88888888,
                0x8a888888,
                0x28282828,
                0x82828282,
                0x28282828)
     state = State(Color.WHITE, board_r)
-    print(state.board)
 
-    for attack in state.board.get_piece_at(0, 1).possible_attacks:
-        print(attack)
-
-    state.print_next_states()
-    state.generate_next_states()
-    state.print_next_states()
+    alg = SearchAlgorithm(state)
+    print(state)
+    alg.generate_new(2)
 
 
-def test_generating_levels():
+def test_min_max():
     board_r = (0x8a8a8a8a,
                0xa8a8a8a8,
-               0x8a8a8a8a,
+               0x888a8a8a,
                0x88888888,
-               0x88888888,
+               0x8a888888,
                0x28282828,
                0x82828282,
                0x28282828)
     state = State(Color.WHITE, board_r)
 
-    alg = MinMax(state)
+    alg = SearchAlgorithm(state)
     print(state)
-    alg.generate_new(2)
+    print(alg.min_max(state,1)[1])
 
 
 if __name__ == '__main__':
-    test_generating_levels()
+    test_min_max()

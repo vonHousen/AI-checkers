@@ -22,7 +22,7 @@ class State:
         self.board_repr = board_repr
         self.level = level
         self._cached_board = None
-        self._next_states = []
+        self.next_states = []
 
     @property
     def board(self):
@@ -86,7 +86,12 @@ class State:
         return changed_state
 
     def __str__(self):
-        return self.board.__str__()
+        printout = "Balance = " + f'{self.board.balance}' + \
+                "   Turn = " + f'{self.turn}' + \
+                "   Level = " + f'{self.level}' + "\n"
+        printout += self.board.__str__()
+
+        return printout
 
     @property
     def get_next_states(self):
@@ -95,14 +100,11 @@ class State:
         :return: set of next states
         """
 
-        return self._next_states
+        return self.next_states
 
     def print_next_states(self):
-        if self._next_states:
-            for next_state in self._next_states:
-                print("Balance = " + f'{next_state.board.balance}' +
-                "   Turn = " + f'{next_state.turn}' +
-                "   Level = " + f'{next_state.level}')
+        if self.next_states:
+            for next_state in self.next_states:
                 print(next_state)
         else:
             print("<There are no next states available>\n")
@@ -128,10 +130,10 @@ class State:
                     new_state_moved = self._get_state_after_movement(piece.row, piece.column, after_move_loc[0], after_move_loc[1])
                     new_state_moved._next_level()
                     new_state_moved._next_turn()
-                    self._next_states.append(new_state_moved)
+                    self.next_states.append(new_state_moved)
 
         for new_state in set_of_new_states:
-            self._next_states.append(new_state)
+            self.next_states.append(new_state)
 
     def _generate_next_states_during_attack(self, piece):
         """
