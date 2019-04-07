@@ -45,16 +45,10 @@ class Board:
         board = [0, 0, 0, 0, 0, 0, 0, 0]
         for rowNumber, row in enumerate(self.__board):
             for columnNumber, piece in enumerate(row):
-                if isinstance(piece, WhiteMan):
-                    board[rowNumber] |= 0x00000002
-                elif isinstance(piece, WhiteKing):
-                    board[rowNumber] |= 0x00000003
-                elif isinstance(piece, BlackMan):
-                    board[rowNumber] |= 0x0000000a
-                elif isinstance(piece, BlackKing):
-                    board[rowNumber] |= 0x0000000b
-                else:
+                if piece is None:
                     board[rowNumber] |= 0x00000008
+                else:
+                    board[rowNumber] |= piece.get_representation()
                 if columnNumber != 7:
                     board[rowNumber] = board[rowNumber] << 4
         return tuple(board)

@@ -41,10 +41,31 @@ class State:
         :return: true/false
         """
         # TODO implement checking if one color is out of moves
-        if not self.board.get_pieces_of_color(Color.WHITE) or not self.board.get_pieces_of_color(Color.BLACK):
+        white_pieces = self.board.get_pieces_of_color(Color.WHITE)
+        black_pieces = self.board.get_pieces_of_color(Color.BLACK)
+        if not white_pieces or not black_pieces:  # if any of them dont have pieces left
             return True
-        else:
-            return False
+
+        # check if there's any move or attack black can perform
+        found_black_move_or_attack = False
+        for piece in black_pieces:
+            if piece.possible_attacks or piece.possible_moves:
+                found_black_move_or_attack = True
+                break
+        if found_black_move_or_attack is False:
+            return True
+
+        # check if there's any move or attack white can perform
+        # we have some redundancy here which can be avoided but not worth the effort
+        found_white_move_or_attack = False
+        for piece in white_pieces:
+            if piece.possible_attacks or piece.possible_moves:
+                found_white_move_or_attack = True
+                break
+        if found_white_move_or_attack is False:
+            return True
+
+        return False
 
     def clean_cached_board(self):
         self._cached_board = None
@@ -108,8 +129,8 @@ class State:
 
     def __str__(self):
         printout = "Balance = " + f'{self.board.balance}' + \
-                "   Turn = " + f'{self.turn}' + \
-                "   Level = " + f'{self.level}' + "\n"
+                   "   Turn = " + f'{self.turn}' + \
+                   "   Level = " + f'{self.level}' + "\n"
         printout += self.board.__str__()
 
         return printout
@@ -139,7 +160,6 @@ class State:
         if self.next_move:
             self.next_move.print_final_sequence()
 
-
     def generate_next_states(self):
         """
         Generates all possible states generated from the current one (appends to self._next_states)
@@ -153,7 +173,6 @@ class State:
 
                 set_of_new_sub_states = self._generate_next_states_during_attack(piece)
                 for new_sub_state in set_of_new_sub_states:
-
                     new_sub_state._next_level()
                     new_sub_state._next_turn()
                     set_of_new_states.append(new_sub_state)
@@ -162,7 +181,6 @@ class State:
             for piece in self.board.get_moving_pieces_of_color(self.turn):
 
                 for after_move_location in piece.possible_moves:
-
                     new_state_moved = self._get_state_after_movement(piece.row,
                                                                      piece.column,
                                                                      after_move_location[0],
@@ -257,4 +275,3 @@ def test_generating_attacks():
 
 if __name__ == '__main__':
     test_generating_attacks()
-
