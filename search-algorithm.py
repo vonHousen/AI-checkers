@@ -1,6 +1,7 @@
 from state import *
 import time
 
+
 class SearchAlgorithm:
 
     @staticmethod
@@ -12,18 +13,18 @@ class SearchAlgorithm:
 
         if root_state.turn == Color.WHITE:  # assuming white = player & black = opponent
             for child_state in root_state.next_states:
-                best_value = SearchAlgorithm.alpha_beta(child_state, depth - 1, alpha, beta)
-                if best_value > alpha:
-                    alpha = best_value
+                alpha_beta_result_for_this_child = SearchAlgorithm.alpha_beta(child_state, depth - 1, alpha, beta)
+                if alpha_beta_result_for_this_child > alpha:
+                    alpha = alpha_beta_result_for_this_child
                     root_state.next_move = child_state
                 if alpha >= beta:
                     return beta
             return alpha
         else:
             for child_state in root_state.next_states:
-                best_value = SearchAlgorithm.alpha_beta(child_state, depth - 1, alpha, beta)
-                if best_value < beta:
-                    beta = best_value
+                alpha_beta_result_for_this_child = SearchAlgorithm.alpha_beta(child_state, depth - 1, alpha, beta)
+                if alpha_beta_result_for_this_child < beta:
+                    beta = alpha_beta_result_for_this_child
                     root_state.next_move = child_state
                 if alpha >= beta:
                     return alpha
