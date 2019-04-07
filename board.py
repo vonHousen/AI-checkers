@@ -90,14 +90,14 @@ class Board:
         """
         :return: Positive balance means white is winning
         """
-        result = 0
+        result = 0.0
         for piece in self.pieces:
             if piece.get_representation() == 0x0000000a:        # isinstance(piece, BlackMan):
-                result -= 1
+                result -= 1.0
             elif piece.get_representation() == 0x0000000b:      # isinstance(piece, BlackKing):
                 result -= 1.6
             elif piece.get_representation() == 0x00000002:      # isinstance(piece, WhiteMan):
-                result += 1
+                result += 1.0
             elif piece.get_representation() == 0x00000003:      # isinstance(piece, WhiteKing):
                 result += 1.6
         return result
@@ -201,7 +201,7 @@ def test_king_moves():
             #     piece.board.set_piece_at(row, col, "x")
     piece = board.pieces[0]
     row, col = piece.possible_moves[0]
-    piece.move_to(row , col)
+    piece.move_to(row, col)
     print(board)
 
 
