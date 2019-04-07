@@ -123,6 +123,7 @@ class Board:
 
 
 def test_repr_gen():
+    print("Test board repr generation:")
     board = Board()
     print(board)
     for row_repr in board.board_repr:
@@ -133,7 +134,9 @@ def test_repr_gen():
 
 
 def test_man_moves():
+    print("Test man moves:")
     board = Board()
+    print(board)
     for piece in board.pieces:
         moves = piece.possible_moves
         if moves:
@@ -142,6 +145,7 @@ def test_man_moves():
 
 
 def test_man_attacks():
+    print("Test man attacks")
     board_repr = (0x8a8a8a8a,
                   0xa8a8a8a8,
                   0x8a8a8a8a,
@@ -162,6 +166,7 @@ def test_man_attacks():
 
 
 def test_king_moves():
+    print("Test king moves")
     board_repr = (0x88888888,
                   0x88888888,
                   0x88888888,
@@ -188,6 +193,7 @@ def test_king_moves():
 
 
 def test_king_attacks():
+    print("Test king attacks")
     board_repr = (0x88888888,
                   0x88888888,
                   0x88888888,
@@ -212,6 +218,7 @@ def test_king_attacks():
 
 
 def test_replace_with_king():
+    print("Test replace with king")
     board_repr = (0x82828a8a,
                   0xa8a8a8a8,
                   0x8a8a8a8a,
