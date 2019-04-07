@@ -1,4 +1,5 @@
 from state import *
+import time
 
 
 class SearchAlgorithm:
@@ -92,6 +93,7 @@ def test_generating_levels():
 
 
 def test_min_max():
+
     board_r = (0x8a8a8a8a,
                0xa888a8a8,
                0x8a8a8a8a,
@@ -100,21 +102,25 @@ def test_min_max():
                0x28282828,
                0x82828282,
                0x28282828)
-    state = State(Color.WHITE, board_r)
-
+    state = State(Color.WHITE)
     alg = SearchAlgorithm(state)
-    print(20*"-")
+    print(40*"-")
     print("Root state:")
     print(state)
-    print(20*"-")
+    print(40*"-")
     print("Best (final) state:")
-    print(alg.min_max(state, 3)[1])
-    print(20*"-")
-    print("Root's next move (state):")
-    print(state.next_move)
-    print(20*"-")
+    start_min_max = time.time()
+
+    final_state = alg.min_max(state, 2)[1]
+
+    end_min_max = time.time()
+    print(final_state)
+    print(40*"-")
     print("Final sequence:")
     state.print_final_sequence()
+    print()
+    print(40*"-")
+    print("min_max time [s]: " + f'{end_min_max - start_min_max}')
 
 
 if __name__ == '__main__':
