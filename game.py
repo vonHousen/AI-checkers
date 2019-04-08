@@ -75,7 +75,7 @@ def run_game():
                 print(decision_state)
 
 
-def test_evel_time():
+def test_evaluation_time():
     game = Game(6)
     start_time = time.time()
     while game.is_finished() is False:
