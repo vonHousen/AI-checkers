@@ -18,34 +18,6 @@ class State:
         self.next_move = None
         self._value = None
 
-    def hash(self):
-        result = ""
-        board_repr = self._cached_board.board_repr
-        for rowNumber, row in enumerate(board_repr):
-            mask = 0xF0000000
-            for columnNumber in range(8):
-                piece = row & mask
-                if piece == 0x80000000:  # empty or not allowed
-                    result += "e"
-                elif piece == 0x20000000:  # white man
-                    result += "a"
-                elif piece == 0xa0000000:  # black man
-                    result += "b"
-                elif piece == 0x30000000:  # white king
-                    result += "c"
-                elif piece == 0xb0000000:  # black king
-                    result += "d"
-                row = row << 4
-
-        if self.turn is Color.WHITE:
-            result += "a"
-        else:
-            result += "b"
-
-        result += str(self.level)
-
-        return result
-
     def reset_level(self):
         self.level = 0
         if self._cached_board is not None:

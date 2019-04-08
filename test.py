@@ -259,63 +259,6 @@ def test_becoming_kings():
     print("alpha_beta time [s]: " + f'{end_time - start_time}')
 
 
-def test_state_hasing():
-    state1 = State(Board())
-    state2 = State(Board())
-    board_r = (0x88888888,
-               0x28888888,
-               0x88888888,
-               0x88888888,
-               0x88888888,
-               0x8888a888,
-               0x88888288,
-               0x88888888)
-
-    state3 = State(Board(board_r, Color.BLACK))
-    state4 = State(Board(board_r, Color.WHITE))
-    board_r2 = (0x88888888,
-                0x28888888,
-                0x88888888,
-                0x88888888,
-                0x88888888,
-                0x8888a888,
-                0x88888288,
-                0x88888828)
-    state5 = State(Board(board_r2, Color.BLACK))
-
-    if state1.hash() == state2.hash():
-        print("git")
-    else:
-        print("zle")
-    if state1.hash() != state3.hash():
-        print("git")
-    else:
-        print("zle")
-    if state3.hash() != state4.hash():
-        print("git")
-    else:
-        print("zle")
-    if state3.hash() != state5.hash():
-        print("git")
-    else:
-        print("zle")
-
-    dict = {}
-
-    hash1 = state1.hash()
-    hash2 = state2.hash()
-    hash3 = state3.hash()
-    hash4 = state4.hash()
-    hash5 = state5.hash()
-    dict[hash1] = 1
-    dict[hash2] = 2
-    dict[hash3] = 3
-    dict[hash4] = 4
-    dict[hash5] = 5
-    pass
-    # debug me
-
-
 if __name__ == '__main__':
     # test_repr_gen()
     # test_man_moves()
@@ -325,7 +268,6 @@ if __name__ == '__main__':
     # test_replace_with_king()
     # test_simple_attack_generating()
     # test_generating_attacks()
-    test_alpha_beta()
+    # test_alpha_beta()
     # test_kings()
-    # test_becoming_kings()
-    # test_state_hasing()
+    test_becoming_kings()

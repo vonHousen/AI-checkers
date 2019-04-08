@@ -3,9 +3,6 @@ from state import *
 
 class SearchAlgorithm:
 
-    def __init__(self):
-        self.states_dict = {}
-
     def alpha_beta(self, root_state, depth):
         return self._alpha_beta(root_state, depth, -999999, 999999)
 
@@ -16,10 +13,7 @@ class SearchAlgorithm:
         if root_state.turn == Color.WHITE:  # assuming white = player & black = opponent
             for child_state in root_state.next_states:
 
-                alpha_beta = self.states_dict.get((child_state.hash(), depth))
-                if alpha_beta is None:
-                    alpha_beta = self._alpha_beta(child_state, depth - 1, alpha, beta)
-                    self.states_dict[(child_state.hash(), depth)] = alpha_beta
+                alpha_beta = self._alpha_beta(child_state, depth - 1, alpha, beta)
 
                 if alpha_beta > alpha:
                     alpha = alpha_beta
@@ -30,10 +24,7 @@ class SearchAlgorithm:
         else:
             for child_state in root_state.next_states:
 
-                alpha_beta = self.states_dict.get((child_state.hash(), depth))
-                if alpha_beta is None:
-                    alpha_beta = self._alpha_beta(child_state, depth - 1, alpha, beta)
-                    self.states_dict[(child_state.hash(), depth)] = alpha_beta
+                alpha_beta = self._alpha_beta(child_state, depth - 1, alpha, beta)
 
                 if alpha_beta < beta:
                     beta = alpha_beta
