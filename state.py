@@ -73,6 +73,73 @@ class State:
     def clean_cached_board(self):
         self._cached_board = None
 
+    def get_piece_at(self, row, column):
+        return self._board.get_piece_at(row, column)
+
+    def generate_next_states(self):
+        """
+        Generates all possible states generated from the current one (appends to self._next_states)
+        :return: -
+        """
+        set_of_new_states = []
+
+        if self._does_any_piece_can_attack():
+            for piece in self._board.get_attacking_pieces_of_color(self.turn):
+
+                set_of_new_sub_states = self._generate_next_states_during_attack(piece)
+                for new_sub_state, after_attack_row, after_attack_col in set_of_new_sub_states:
+
+                    # if attacking piece after finished attack is a man and can become a king - do so
+                    moved_piece = new_sub_state.get_piece_at(after_attack_row, after_attack_col)
+                    # if isinstance(piece, WhiteMan) or isinstance(piece, BlackMan)
+                    if moved_piece.get_representation() == 0x0000000a or moved_piece.get_representation() == 0x00000002:
+                        if moved_piece.can_be_replaced_with_king():
+                            moved_piece.replace_with_king()
+
+                    new_sub_state.next_level()
+                    new_sub_state.next_turn()
+                    set_of_new_states.append(new_sub_state)
+
+        else:
+            for piece in self._board.get_moving_pieces_of_color(self.turn):
+
+                for after_move_row, after_move_col in piece.possible_moves:
+                    new_state_moved = self._get_state_after_movement(piece.row,
+                                                                     piece.column,
+                                                                     after_move_row,
+                                                                     after_move_col)
+
+                    # if moved_piece is a man and can become a king - do so
+                    moved_piece = new_state_moved.get_piece_at(after_move_row, after_move_col)
+                    # if isinstance(piece, WhiteMan) or isinstance(piece, BlackMan)
+                    if moved_piece.get_representation() == 0x0000000a or moved_piece.get_representation() == 0x00000002:
+                        if moved_piece.can_be_replaced_with_king():
+                            moved_piece.replace_with_king()
+
+                    new_state_moved.next_level()
+                    new_state_moved.next_turn()
+                    self.next_states.append(new_state_moved)
+
+        for new_state in set_of_new_states:
+            self.next_states.append(new_state)
+
+    def next_level(self):
+        """
+        Changes deepness level in tree structure
+        :return:
+        """
+        self.level += 1
+
+    def next_turn(self):
+        """
+        Changes turn of current state
+        :return: -
+        """
+        if self.turn == Color.BLACK:
+            self.turn = Color.WHITE
+        else:
+            self.turn = Color.BLACK
+
     def _get_state_after_movement(self, row_current, column_current, row_desired, column_desired):
         """
         Universal method to move one piece from curr loc to desired. It's not validating movements!
@@ -142,80 +209,6 @@ class State:
 
         return printout
 
-    @property
-    def get_next_states(self):
-        """
-        :return: set of next states
-        """
-
-        return self.next_states
-
-    def get_piece_at(self, row, column):
-        return self._board.get_piece_at(row, column)
-
-    def print_next_states(self):
-        if self.next_states:
-            for next_state in self.next_states:
-                print(next_state)
-        else:
-            print("<There are no next states available>\n")
-
-    def print_final_sequence(self):
-        """
-        Prints recursively final sequence of moves resulting in best game outcome
-        :return: -
-        """
-        print(self)
-        if self.next_move:
-            self.next_move.print_final_sequence()
-
-    def generate_next_states(self):
-        """
-        Generates all possible states generated from the current one (appends to self._next_states)
-        :return: -
-        """
-        set_of_new_states = []
-
-        if self._does_any_piece_can_attack():
-            for piece in self._board.get_attacking_pieces_of_color(self.turn):
-
-                set_of_new_sub_states = self._generate_next_states_during_attack(piece)
-                for new_sub_state, after_attack_row, after_attack_col in set_of_new_sub_states:
-
-                    # if attacking piece after finished attack is a man and can become a king - do so
-                    moved_piece = new_sub_state.get_piece_at(after_attack_row, after_attack_col)
-                    # if isinstance(piece, WhiteMan) or isinstance(piece, BlackMan)
-                    if moved_piece.get_representation() == 0x0000000a or moved_piece.get_representation() == 0x00000002:
-                        if moved_piece.can_be_replaced_with_king():
-                            moved_piece.replace_with_king()
-
-                    new_sub_state.next_level()
-                    new_sub_state.next_turn()
-                    set_of_new_states.append(new_sub_state)
-
-        else:
-            for piece in self._board.get_moving_pieces_of_color(self.turn):
-
-                for after_move_row, after_move_col in piece.possible_moves:
-                    new_state_moved = self._get_state_after_movement(piece.row,
-                                                                     piece.column,
-                                                                     after_move_row,
-                                                                     after_move_col)
-
-                    # if moved_piece is a man and can become a king - do so
-                    moved_piece = new_state_moved.get_piece_at(after_move_row, after_move_col)
-                    # if isinstance(piece, WhiteMan) or isinstance(piece, BlackMan)
-                    if moved_piece.get_representation() == 0x0000000a or moved_piece.get_representation() == 0x00000002:
-                        if moved_piece.can_be_replaced_with_king():
-                            moved_piece.replace_with_king()
-
-                    new_state_moved.next_level()
-                    new_state_moved.next_turn()
-                    self.next_states.append(new_state_moved)
-
-        for new_state in set_of_new_states:
-            self.next_states.append(new_state)
-
     def _generate_next_states_during_attack(self, piece):
         """
         Generates all possible states generated from the current one for given piece
@@ -241,43 +234,28 @@ class State:
 
         return set_of_new_states
 
-    def next_turn(self):
-        """
-        Changes turn of current state
-        :return: -
-        """
-        if self.turn == Color.BLACK:
-            self.turn = Color.WHITE
-        else:
-            self.turn = Color.BLACK
 
-    def next_level(self):
-        """
-        Changes deepness level in tree structure
-        :return:
-        """
-        self.level += 1
+def print_next_states(state):
+    """
+    Used only for testing
+    :return:
+    """
+    if state.next_states:
+        for next_state in state.next_states:
+            print(next_state)
+    else:
+        print("<There are no next states available>\n")
 
-    def test_print_next_states(self):
-        """
-        Used only for testing
-        :return:
-        """
-        if self.next_states:
-            for next_state in self.next_states:
-                print(next_state)
-        else:
-            print("<There are no next states available>\n")
 
-    def test_print_final_decision_chain(self):
-        """
-        Used only for testing
-        Prints recursively final chain of moves resulting in best game outcome
-        :return: -
-        """
-        print(self)
-        if self.next_move:
-            self.next_move.test_print_final_decision_chain()
+def print_final_decision_chain(state):
+    """
+    Used only for testing
+    Prints recursively final chain of moves resulting in best game outcome
+    :return: -
+    """
+    print(state)
+    if state.next_move:
+        print_final_decision_chain(state.next_move)
 
 
 def test_simple_attack():
@@ -291,9 +269,9 @@ def test_simple_attack():
                0x28282828
                )
     state = State(Color.WHITE, board_r)
-    print(state._board)
+    print(state)
     print(state._get_state_after_attack(5, 2, 3, 0))
-    print(state._board)  # should be the first board itself (unchanged)
+    print(state)  # should be the first board itself (unchanged)
     state.clean_cached_board()
 
 
@@ -308,14 +286,14 @@ def test_generating_attacks():
                0x28282828
                )
     state = State(Color.WHITE, board_r)
-    print(state._board)
+    print(state)
 
     for attack in state._board.get_piece_at(0, 1).possible_attacks:
         print(attack)
 
-    state.test_print_next_states()
+    print_next_states(state)
     state.generate_next_states()
-    state.test_print_next_states()
+    print_next_states(state)
 
 
 if __name__ == '__main__':
