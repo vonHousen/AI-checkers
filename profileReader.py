@@ -5,8 +5,8 @@ def main():
     ProfileReader.read_print_stats()
 
 
-# najpierw odpalasz komende np taka:     python -m cProfile -o profiling_results board.py
-# potem:                                 python profileReader.py
+# najpierw odpalasz komende np taka:     python3 -m cProfile -o profiling_results board.py
+# potem:                                 python3 profileReader.py
 # widzisz w ktorych funkacjach program spedzil najwiecej czasu
 
 class ProfileReader:

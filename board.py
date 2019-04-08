@@ -29,16 +29,16 @@ class Board:
             mask = 0xF0000000
             for columnNumber in range(8):
                 piece = row & mask
-                if piece == 0x20000000:  # white man
+                if piece == 0x80000000:  # empty or not allowed
+                    self.__board[rowNumber].append(None)
+                elif piece == 0x20000000:  # white man
                     self.__board[rowNumber].append(WhiteMan(rowNumber, columnNumber, self))
-                elif piece == 0x30000000:  # white king
-                    self.__board[rowNumber].append(WhiteKing(rowNumber, columnNumber, self))
                 elif piece == 0xa0000000:  # black man
                     self.__board[rowNumber].append(BlackMan(rowNumber, columnNumber, self))
+                elif piece == 0x30000000:  # white king
+                    self.__board[rowNumber].append(WhiteKing(rowNumber, columnNumber, self))
                 elif piece == 0xb0000000:  # black king
                     self.__board[rowNumber].append(BlackKing(rowNumber, columnNumber, self))
-                else:  # empty or not allowed
-                    self.__board[rowNumber].append(None)
                 row = row << 4
 
     @property
@@ -142,8 +142,6 @@ class Board:
                         if moved_piece.can_be_replaced_with_king():
                             moved_piece.replace_with_king()
 
-                    new_sub_board.next_level()
-                    new_sub_board.next_turn()
                     set_of_new_boards.append(new_sub_board)
 
         else:
@@ -162,10 +160,11 @@ class Board:
                         if moved_piece.can_be_replaced_with_king():
                             moved_piece.replace_with_king()
 
-                    new_board_moved.next_level()
-                    new_board_moved.next_turn()
                     set_of_new_boards.append(new_board_moved)
 
+        for board in set_of_new_boards:
+            board.next_level()
+            board.next_turn()
         return set_of_new_boards
 
     def _generate_next_boards_during_attack(self, piece):
@@ -245,6 +244,28 @@ class Board:
         for piece in self.get_pieces_of_color(self.turn):
             if piece.can_attack_anywhere():
                 return True
+        return False
+
+    def did_game_end(self):
+        """
+        Defines if state is terminal or not
+        :return: true/false
+        """
+        # get pieces of player that is moving in this turn
+        pieces = self.get_pieces_of_color(self.turn)
+
+        if not pieces:  # if you have no pieces left its game over
+            return True
+
+        # check if there's any move or attack current player can perform
+        found_move_or_attack = False
+        for piece in pieces:
+            if piece.possible_attacks or piece.possible_moves:
+                found_move_or_attack = True
+                break
+        if found_move_or_attack is False:
+            return True
+
         return False
 
     def next_level(self):

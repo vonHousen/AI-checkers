@@ -3,39 +3,66 @@ from board import *
 
 class State:
 
-    def __init__(self, next_turn=Color.WHITE, board_repr=(0x8a8a8a8a,
-                                                          0xa8a8a8a8,
-                                                          0x8a8a8a8a,
-                                                          0x88888888,
-                                                          0x88888888,
-                                                          0x28282828,
-                                                          0x82828282,
-                                                          0x28282828
-                                                          )):
-        self.turn = next_turn
+    def __init__(self, board):
+        self.turn = board.turn
         # 8 not allowed or empty
         # 2 white man
         # 3 white king
         # a black man
         # b black king
-        self.board_repr = board_repr
-        self.level = "fix"
-        self._cached_board = None
+        # self.board_repr = board.board_repr
+        self.level = board.level
+        self.is_terminal = board.did_game_end()
+        self._cached_board = board
 
         self.next_move = None
         self._value = None
+
+    def hash(self):
+        result = ""
+        board_repr = self._cached_board.board_repr
+        for rowNumber, row in enumerate(board_repr):
+            mask = 0xF0000000
+            for columnNumber in range(8):
+                piece = row & mask
+                if piece == 0x80000000:  # empty or not allowed
+                    result += "e"
+                elif piece == 0x20000000:  # white man
+                    result += "a"
+                elif piece == 0xa0000000:  # black man
+                    result += "b"
+                elif piece == 0x30000000:  # white king
+                    result += "c"
+                elif piece == 0xb0000000:  # black king
+                    result += "d"
+                row = row << 4
+
+        if self.turn is Color.WHITE:
+            result += "a"
+        else:
+            result += "b"
+
+        result += str(self.level)
+
+        return result
+
+    def reset_level(self):
+        self.level = 0
+        if self._cached_board is not None:
+            self._cached_board.level = 0
 
     @property
     def next_states(self):
         boards = self._board.get_next_boards()
         result = []
         for board in boards:
-            result.append(State(board.turn, board.board_repr))
+            new_state = State(board)
+            result.append(new_state)
         return result
 
     @property
     def balance(self):
-        if self.is_terminal():
+        if self.is_terminal:
             if self.turn is Color.WHITE:  # black wins
                 return -1000
             else:  # white wins
@@ -51,31 +78,10 @@ class State:
         Cache new Board object (using stored representation) if it doesn't exist
         :return: Cached or just created Board object
         """
-        if self._cached_board is None:
-            self._cached_board = Board(self.board_repr, self.turn)
         return self._cached_board
-
-    def is_terminal(self):
-        """
-        Defines if state is terminal or not
-        :return: true/false
-        """
-        # get pieces of player that is moving in this turn
-        pieces = self._board.get_pieces_of_color(self.turn)
-
-        if not pieces:  # if you have no pieces left its game over
-            return True
-
-        # check if there's any move or attack current player can perform
-        found_move_or_attack = False
-        for piece in pieces:
-            if piece.possible_attacks or piece.possible_moves:
-                found_move_or_attack = True
-                break
-        if found_move_or_attack is False:
-            return True
-
-        return False
+        # if self._cached_board is None:
+        #     self._cached_board = Board(self.board_repr, self.turn)
+        # return self._cached_board
 
     def clean_cached_board(self):
         self._cached_board = None
