@@ -113,8 +113,8 @@ class Piece(ABC):
                 :param column_desired: destination to move
                 :return: true/false
                 """
-        if (row_desired, column_desired) not in self._potential_moves():
-            raise ValueError("This piece can't be moved in this direction")
+        # if (row_desired, column_desired) not in self._potential_moves():
+        #     raise ValueError("This piece can't be moved in this direction")
 
         if not is_allowed_cell_on_board(row_desired, column_desired):
             return False
@@ -135,8 +135,8 @@ class Piece(ABC):
         :param column_desired: location after an attack
         :return: true/false
         """
-        if (row_desired, column_desired) not in self._potential_attacks():
-            raise ValueError("This piece can't be attack in this direction")
+        # if (row_desired, column_desired) not in self._potential_attacks():
+        #     raise ValueError("This piece can't be attack in this direction")
 
         if not is_allowed_cell_on_board(row_desired, column_desired):
             return False

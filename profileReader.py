@@ -13,8 +13,8 @@ class ProfileReader:
     @staticmethod
     def read_print_stats():
         stats = pstats.Stats("profiling_results")
-        stats.sort_stats("cumtime")  # całkowity czas spedzony w funkcji i jej wywołaniach
-        # stats.sort_stats("tottime")  # czas spędzony tylko w tej funkcji
+        # stats.sort_stats("cumtime")  # całkowity czas spedzony w funkcji i jej wywołaniach
+        stats.sort_stats("tottime")  # czas spędzony tylko w tej funkcji
         stats.print_stats(30)
 
 

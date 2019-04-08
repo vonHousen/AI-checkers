@@ -75,5 +75,16 @@ def run_game():
                 print(decision_state)
 
 
+def test_evel_time():
+    game = Game(6)
+    start_time = time.time()
+    while game.is_finished() is False:
+        game.calculate_next_move()
+        game.make_move()
+    end_time = time.time()
+    print("calculation time [s]: " + f'{end_time - start_time}')
+
+
 if __name__ == '__main__':
     run_game()
+    # test_evel_time()

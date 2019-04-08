@@ -145,12 +145,10 @@ class State:
     @property
     def get_next_states(self):
         """
-
         :return: set of next states
         """
 
         return self.next_states
-
 
     def get_piece_at(self, row, column):
         return self._board.get_piece_at(row, column)
@@ -170,7 +168,7 @@ class State:
         print(self)
         if self.next_move:
             self.next_move.print_final_sequence()
-            
+
     def generate_next_states(self):
         """
         Generates all possible states generated from the current one (appends to self._next_states)
