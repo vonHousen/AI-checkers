@@ -1,27 +1,29 @@
 from state import *
 from search_algorithm import SearchAlgorithm
 import time
-
+import copy
 
 class Game:
     def __init__(self, depth):
         self.moves_made = 0
-        self.current_state = State()
+        self.current_state = State(Board())
         self.depth = depth
 
     def calculate_next_move(self):
         if self.is_finished():
             raise RuntimeError("Making moves in a finished game")
         print(f"Calculating move number {self.moves_made + 1}")
-        SearchAlgorithm.alpha_beta(self.current_state, self.depth)
+        SearchAlgorithm().alpha_beta(self.current_state, self.depth)
 
     def make_move(self):
         if self.is_finished():
             raise RuntimeError("Making moves in a finished game")
 
         next_state = self.current_state.next_move
-        self.current_state = State(next_state.turn,
-                                   next_state._board.board_repr)  # todo remove _board after moving gen states
+        self.current_state = copy.deepcopy(next_state)
+        self.current_state.reset_level()
+        self.current_state.next_move = None
+        self.current_state._value = None
         self.moves_made += 1
 
     @property
@@ -34,7 +36,7 @@ class Game:
         return result
 
     def is_finished(self):
-        if self.current_state.is_terminal():
+        if self.current_state.is_terminal:
             return True
         return False
 
@@ -69,11 +71,24 @@ def run_game():
     for state, decision_chain in game_history:
         user_input = input(
             "If you want to see how the decision will be made type 'd' and press enter, else just enter\n")
+        print("Move:")
         print(state)
+        print("Decision chain:")
         if user_input is "d" or user_input is "D":
             for decision_state in decision_chain:
                 print(decision_state)
 
 
+def test_evaluation_time():
+    game = Game(8)
+    start_time = time.time()
+    while game.is_finished() is False:
+        game.calculate_next_move()
+        game.make_move()
+    end_time = time.time()
+    print("calculation time [s]: " + f'{end_time - start_time}')
+
+
 if __name__ == '__main__':
     run_game()
+    # test_evaluation_time()
