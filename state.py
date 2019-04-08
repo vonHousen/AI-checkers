@@ -1,5 +1,4 @@
 from board import *
-import copy
 
 
 class State:
@@ -287,10 +286,6 @@ def test_generating_attacks():
                )
     state = State(Color.WHITE, board_r)
     print(state)
-
-    for attack in state._board.get_piece_at(0, 1).possible_attacks:
-        print(attack)
-
     print_next_states(state)
     state.generate_next_states()
     print_next_states(state)
