@@ -139,8 +139,8 @@ def test_replace_with_king():
     print(board)
 
 
-def test_simple_attack():
-    print("test_simple_attack")
+def test_simple_attack_generating():
+    print("test_simple_attack_generating")
     board_r = (0x8a8a8a8a,
                0xa8a8a8a8,
                0x888a8a8a,
@@ -154,7 +154,7 @@ def test_simple_attack():
     print(state)
 
     # noinspection PyProtectedMember
-    print(state._get_state_after_attack(5, 2, 3, 0))
+    print(state._board._get_board_after_attack(5, 2, 3, 0))
     print(state)  # should be the first board itself (unchanged)
     state.clean_cached_board()
 
@@ -172,8 +172,6 @@ def test_generating_attacks():
                )
     state = State(Color.WHITE, board_r)
     print(state)
-    print_next_states(state)
-    state.generate_next_states()
     print_next_states(state)
 
 
@@ -262,14 +260,14 @@ def test_becoming_kings():
 
 
 if __name__ == '__main__':
-    test_repr_gen()
-    test_man_moves()
-    test_man_attacks()
-    test_king_moves()
-    test_king_attacks()
-    test_replace_with_king()
-    test_simple_attack()
-    test_generating_attacks()
+    # test_repr_gen()
+    # test_man_moves()
+    # test_man_attacks()
+    # test_king_moves()
+    # test_king_attacks()
+    # test_replace_with_king()
+    # test_simple_attack_generating()
+    # test_generating_attacks()
     test_alpha_beta()
-    test_kings()
-    test_becoming_kings()
+    # test_kings()
+    # test_becoming_kings()

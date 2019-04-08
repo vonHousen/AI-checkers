@@ -21,7 +21,7 @@ class Game:
 
         next_state = self.current_state.next_move
         self.current_state = State(next_state.turn,
-                                   next_state._board.board_repr)  # todo remove _board after moving gen states
+                                   next_state.board_repr)  # todo remove _board after moving gen states
         self.moves_made += 1
 
     @property

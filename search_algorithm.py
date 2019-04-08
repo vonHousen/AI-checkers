@@ -11,8 +11,6 @@ class SearchAlgorithm:
     def _alpha_beta(root_state, depth, alpha, beta):
         if depth <= 0 or root_state.is_terminal():
             return root_state.balance
-        else:
-            root_state.generate_next_states()
 
         if root_state.turn == Color.WHITE:  # assuming white = player & black = opponent
             for child_state in root_state.next_states:

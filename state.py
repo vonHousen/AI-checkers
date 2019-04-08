@@ -11,7 +11,7 @@ class State:
                                                           0x28282828,
                                                           0x82828282,
                                                           0x28282828
-                                                          ), level=0):
+                                                          )):
         self.turn = next_turn
         # 8 not allowed or empty
         # 2 white man
@@ -19,11 +19,19 @@ class State:
         # a black man
         # b black king
         self.board_repr = board_repr
-        self.level = level
+        self.level = "fix"
         self._cached_board = None
-        self.next_states = []
+
         self.next_move = None
         self._value = None
+
+    @property
+    def next_states(self):
+        boards = self._board.get_next_boards()
+        result = []
+        for board in boards:
+            result.append(State(board.turn, board.board_repr))
+        return result
 
     @property
     def balance(self):
@@ -44,7 +52,7 @@ class State:
         :return: Cached or just created Board object
         """
         if self._cached_board is None:
-            self._cached_board = Board(self.board_repr)
+            self._cached_board = Board(self.board_repr, self.turn)
         return self._cached_board
 
     def is_terminal(self):
@@ -72,128 +80,6 @@ class State:
     def clean_cached_board(self):
         self._cached_board = None
 
-    def get_piece_at(self, row, column):
-        return self._board.get_piece_at(row, column)
-
-    def generate_next_states(self):
-        """
-        Generates all possible states generated from the current one (appends to self._next_states)
-        :return: -
-        """
-        set_of_new_states = []
-
-        if self._does_any_piece_can_attack():
-            for piece in self._board.get_attacking_pieces_of_color(self.turn):
-
-                set_of_new_sub_states = self._generate_next_states_during_attack(piece)
-                for new_sub_state, after_attack_row, after_attack_col in set_of_new_sub_states:
-
-                    # if attacking piece after finished attack is a man and can become a king - do so
-                    moved_piece = new_sub_state.get_piece_at(after_attack_row, after_attack_col)
-                    # if isinstance(piece, WhiteMan) or isinstance(piece, BlackMan)
-                    if moved_piece.get_representation() == 0x0000000a or moved_piece.get_representation() == 0x00000002:
-                        if moved_piece.can_be_replaced_with_king():
-                            moved_piece.replace_with_king()
-
-                    new_sub_state.next_level()
-                    new_sub_state.next_turn()
-                    set_of_new_states.append(new_sub_state)
-
-        else:
-            for piece in self._board.get_moving_pieces_of_color(self.turn):
-
-                for after_move_row, after_move_col in piece.possible_moves:
-                    new_state_moved = self._get_state_after_movement(piece.row,
-                                                                     piece.column,
-                                                                     after_move_row,
-                                                                     after_move_col)
-
-                    # if moved_piece is a man and can become a king - do so
-                    moved_piece = new_state_moved.get_piece_at(after_move_row, after_move_col)
-                    # if isinstance(piece, WhiteMan) or isinstance(piece, BlackMan)
-                    if moved_piece.get_representation() == 0x0000000a or moved_piece.get_representation() == 0x00000002:
-                        if moved_piece.can_be_replaced_with_king():
-                            moved_piece.replace_with_king()
-
-                    new_state_moved.next_level()
-                    new_state_moved.next_turn()
-                    self.next_states.append(new_state_moved)
-
-        for new_state in set_of_new_states:
-            self.next_states.append(new_state)
-
-    def next_level(self):
-        """
-        Changes deepness level in tree structure
-        :return:
-        """
-        self.level += 1
-
-    def next_turn(self):
-        """
-        Changes turn of current state
-        :return: -
-        """
-        if self.turn == Color.BLACK:
-            self.turn = Color.WHITE
-        else:
-            self.turn = Color.BLACK
-
-    def _get_state_after_movement(self, row_current, column_current, row_desired, column_desired):
-        """
-        Universal method to move one piece from curr loc to desired. It's not validating movements!
-        :param row_current: current location of a piece to move
-        :param column_current: current location of a piece to move
-        :param row_desired: desired destination to move to
-        :param column_desired: desired destination to move to
-        :return: new state (deepcopy) generated due to the movement
-        """
-
-        # copy self.state and change it's copy
-        changed_state = State(self.turn, self._board.board_repr, self.level)
-        changed_board = changed_state._board
-
-        if changed_board.is_there_piece_at(row_current, column_current):
-            moved_piece = changed_board.get_piece_at(row_current, column_current)
-            moved_piece.move_to(row_desired, column_desired)
-
-        else:
-            raise RuntimeError("Moving piece do not exist")
-
-        return changed_state
-
-    def _get_state_after_attack(self, row_current, column_current, row_after_attack, column_after_attack):
-        """
-
-        :param row_current: current location of a piece to move
-        :param column_current: current location of a piece to move
-        :param row_after_attack: location after attack
-        :param column_after_attack: location after attack
-        :return: new state (deep copy) generated due to the attack
-        """
-
-        # copy self.state and change it's copy
-        changed_state = State(self.turn, self._board.board_repr, self.level)
-        changed_board = changed_state._board
-
-        if changed_board.is_there_piece_at(row_current, column_current):
-            attacking_piece = changed_board.get_piece_at(row_current, column_current)
-            attacking_piece.attack_to(row_after_attack, column_after_attack)
-
-        else:
-            raise RuntimeError("Attacking piece do not exist")
-
-        return changed_state
-
-    def _does_any_piece_can_attack(self):
-        """
-        Defines if any piece can attack
-        :return: true/false
-        """
-        for piece in self._board.get_pieces_of_color(self.turn):
-            if piece.can_attack_anywhere():
-                return True
-        return False
 
     def __str__(self):
         printout = ""
@@ -207,28 +93,3 @@ class State:
         printout += self._board.__str__()
 
         return printout
-
-    def _generate_next_states_during_attack(self, piece):
-        """
-        Generates all possible states generated from the current one for given piece
-        Used only during multiple-attack
-        :return: set of new states
-        """
-        set_of_new_states = []
-
-        for after_attack_row, after_attack_col in piece.possible_attacks:
-
-            new_state = \
-                self._get_state_after_attack(piece.row, piece.column, after_attack_row, after_attack_col)
-            set_of_new_states.append(tuple((new_state, after_attack_row, after_attack_col)))
-
-            # if just appended state result in multiple-attack: append new states, delete prev.
-            attacking_piece = new_state.get_piece_at(after_attack_row, after_attack_col)
-            if attacking_piece.possible_attacks:
-
-                set_of_new_states.pop()
-                set_of_new_sub_states = new_state._generate_next_states_during_attack(attacking_piece)
-                for new_sub_state, after_sub_attack_row, after_sub_attack_col in set_of_new_sub_states:
-                    set_of_new_states.append(tuple((new_sub_state, after_sub_attack_row, after_sub_attack_col)))
-
-        return set_of_new_states
