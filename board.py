@@ -1,3 +1,5 @@
+from typing import List, Any, Union
+
 from piece import *
 
 
@@ -109,7 +111,9 @@ class Board:
             return False
         return True
 
-    def get_piece_at(self, row, column):
+    def get_piece_at(self, row, column) -> Union[BlackMan, WhiteMan, BlackKing, WhiteKing]:
+        # there's bug with pycharm correcly identyfing type when using double indexing
+        # noinspection PyTypeChecker
         return self.__board[row][column]
 
     def delete_piece_at(self, row, column):
@@ -179,7 +183,7 @@ class Board:
             set_of_new_boards.append(tuple((new_board, after_attack_row, after_attack_col)))
 
             # if just appended state result in multiple-attack: append new states, delete prev.
-            attacking_piece = new_board.get_piece_at(after_attack_row, after_attack_col)
+            attacking_piece: Piece = new_board.get_piece_at(after_attack_row, after_attack_col)
             if attacking_piece.possible_attacks:
 
                 set_of_new_boards.pop()

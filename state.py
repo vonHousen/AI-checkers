@@ -80,7 +80,6 @@ class State:
     def clean_cached_board(self):
         self._cached_board = None
 
-
     def __str__(self):
         printout = ""
         printout += "Turn = " + f'{self.turn}'
