@@ -130,9 +130,14 @@ class State:
         return False
 
     def __str__(self):
-        printout = "Balance = " + f'{self._board.balance}' + \
-                   "   Turn = " + f'{self.turn}' + \
-                   "   Level = " + f'{self.level}' + "\n"
+        printout = ""
+        printout += "Turn = " + f'{self.turn}'
+        printout += "   Balance = " + f'{self._board.balance}'
+        if self._board.balance < 0:
+            printout += "(black is winning)"
+        elif self._board.balance > 0:
+            printout += "(white is winning)"
+        printout += "   Depth_level = " + f'{self.level}' + "\n"
         printout += self._board.__str__()
 
         return printout
@@ -145,6 +150,7 @@ class State:
         """
 
         return self.next_states
+
 
     def get_piece_at(self, row, column):
         return self._board.get_piece_at(row, column)
@@ -164,7 +170,7 @@ class State:
         print(self)
         if self.next_move:
             self.next_move.print_final_sequence()
-
+            
     def generate_next_states(self):
         """
         Generates all possible states generated from the current one (appends to self._next_states)
@@ -254,6 +260,27 @@ class State:
         """
         self.level += 1
 
+    def test_print_next_states(self):
+        """
+        Used only for testing
+        :return:
+        """
+        if self.next_states:
+            for next_state in self.next_states:
+                print(next_state)
+        else:
+            print("<There are no next states available>\n")
+
+    def test_print_final_decision_chain(self):
+        """
+        Used only for testing
+        Prints recursively final chain of moves resulting in best game outcome
+        :return: -
+        """
+        print(self)
+        if self.next_move:
+            self.next_move.test_print_final_decision_chain()
+
 
 def test_simple_attack():
     board_r = (0x8a8a8a8a,
@@ -288,9 +315,9 @@ def test_generating_attacks():
     for attack in state._board.get_piece_at(0, 1).possible_attacks:
         print(attack)
 
-    state.print_next_states()
+    state.test_print_next_states()
     state.generate_next_states()
-    state.print_next_states()
+    state.test_print_next_states()
 
 
 if __name__ == '__main__':
