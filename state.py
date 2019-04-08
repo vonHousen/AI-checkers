@@ -151,6 +151,26 @@ class State:
 
         return self.next_states
 
+
+    def get_piece_at(self, row, column):
+        return self._board.get_piece_at(row, column)
+
+    def print_next_states(self):
+        if self.next_states:
+            for next_state in self.next_states:
+                print(next_state)
+        else:
+            print("<There are no next states available>\n")
+
+    def print_final_sequence(self):
+        """
+        Prints recursively final sequence of moves resulting in best game outcome
+        :return: -
+        """
+        print(self)
+        if self.next_move:
+            self.next_move.print_final_sequence()
+            
     def generate_next_states(self):
         """
         Generates all possible states generated from the current one (appends to self._next_states)
@@ -158,7 +178,6 @@ class State:
         """
         set_of_new_states = []
 
-        # TODO take into consideration Kings logic (movements, attack, upgrades)
         if self._does_any_piece_can_attack():
             for piece in self._board.get_attacking_pieces_of_color(self.turn):
 
@@ -166,14 +185,14 @@ class State:
                 for new_sub_state, after_attack_row, after_attack_col in set_of_new_sub_states:
 
                     # if attacking piece after finished attack is a man and can become a king - do so
-                    moved_piece = new_sub_state._board.get_piece_at(after_attack_row, after_attack_col)
+                    moved_piece = new_sub_state.get_piece_at(after_attack_row, after_attack_col)
                     # if isinstance(piece, WhiteMan) or isinstance(piece, BlackMan)
                     if moved_piece.get_representation() == 0x0000000a or moved_piece.get_representation() == 0x00000002:
                         if moved_piece.can_be_replaced_with_king():
                             moved_piece.replace_with_king()
 
-                    new_sub_state._next_level()
-                    new_sub_state._next_turn()
+                    new_sub_state.next_level()
+                    new_sub_state.next_turn()
                     set_of_new_states.append(new_sub_state)
 
         else:
@@ -186,14 +205,14 @@ class State:
                                                                      after_move_col)
 
                     # if moved_piece is a man and can become a king - do so
-                    moved_piece = new_state_moved._board.get_piece_at(after_move_row, after_move_col)
+                    moved_piece = new_state_moved.get_piece_at(after_move_row, after_move_col)
                     # if isinstance(piece, WhiteMan) or isinstance(piece, BlackMan)
                     if moved_piece.get_representation() == 0x0000000a or moved_piece.get_representation() == 0x00000002:
                         if moved_piece.can_be_replaced_with_king():
                             moved_piece.replace_with_king()
 
-                    new_state_moved._next_level()
-                    new_state_moved._next_turn()
+                    new_state_moved.next_level()
+                    new_state_moved.next_turn()
                     self.next_states.append(new_state_moved)
 
         for new_state in set_of_new_states:
@@ -214,7 +233,7 @@ class State:
             set_of_new_states.append(tuple((new_state, after_attack_row, after_attack_col)))
 
             # if just appended state result in multiple-attack: append new states, delete prev.
-            attacking_piece = new_state._board.get_piece_at(after_attack_row, after_attack_col)
+            attacking_piece = new_state.get_piece_at(after_attack_row, after_attack_col)
             if attacking_piece.possible_attacks:
 
                 set_of_new_states.pop()
@@ -224,7 +243,7 @@ class State:
 
         return set_of_new_states
 
-    def _next_turn(self):
+    def next_turn(self):
         """
         Changes turn of current state
         :return: -
@@ -234,7 +253,7 @@ class State:
         else:
             self.turn = Color.BLACK
 
-    def _next_level(self):
+    def next_level(self):
         """
         Changes deepness level in tree structure
         :return:
