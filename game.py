@@ -40,6 +40,7 @@ class Game:
 
 
 def run_game():
+    # get depth from user
     while True:
         try:
             depth = int(input("Give me the depth you want to search:\n"))
@@ -49,6 +50,8 @@ def run_game():
             print("pls be serious: 0 < depth < 10")
         else:
             break
+
+    # play game till the end and save it history
     game = Game(depth)
     game_history = []
 
@@ -57,10 +60,12 @@ def run_game():
         game.calculate_next_move()
         game_history.append((game.current_state, game.decision_chain))
         game.make_move()
+    game_history.append((game.current_state, game.decision_chain))  # append the last move
     end_time = time.time()
 
     print("calculation time [s]: " + f'{end_time - start_time}')
 
+    # print the history to the user
     for state, decision_chain in game_history:
         user_input = input(
             "If you want to see how the decision will be made type 'd' and press enter, else just enter\n")
